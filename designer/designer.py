@@ -8,7 +8,9 @@ from road.highway import Highway
 class DesignerState(Enum):
     none = 0,
     choosing_origin = 1,
-    creatingStraightLine = 2
+    creatingStraightLine = 2,
+    creatingBezierCurveEndPoint = 3,
+    creatingBezierCurveControlPoint = 4
 
 
 def get_mouse_clicked():
@@ -31,6 +33,7 @@ class Designer:
         self.choose_origin = None
         self.remove_lane = None
         self.add_straight_segment = None
+        self.add_curve_segment = None
         self.state = DesignerState.none
 
         self.init_menu()
@@ -41,20 +44,24 @@ class Designer:
         self.add_lane = Button((10, 10), (70, 20), (255, 0, 0), "Add Lane", pygame.font.Font(None, 15))
         self.remove_lane = Button((10, 40), (90, 20), (255, 0, 0), "Remove Lane", pygame.font.Font(None, 15))
         self.choose_origin = Button((10, 70), (120, 20), (255, 0, 0), "Choose Origin Point", pygame.font.Font(None, 15))
-        self.add_straight_segment = Button((10, 100), (120, 20), (255, 0, 0), "Add Straight Segment", pygame.font.Font(None, 15))
+        self.add_straight_segment = Button((10, 100), (120, 20), (255, 0, 0), "Add Straight Segment",
+                                           pygame.font.Font(None, 15))
+        self.add_curve_segment = Button((10, 130), (120, 20), (255, 0, 0), "Add Curved Segment",
+                                        pygame.font.Font(None, 15))
 
     def draw_buttons(self):
         self.add_lane.draw(self.draw_surface)
         self.choose_origin.draw(self.draw_surface)
         self.remove_lane.draw(self.draw_surface)
         self.add_straight_segment.draw(self.draw_surface)
+        self.add_curve_segment.draw(self.draw_surface)
 
     def draw_title(self, text):
         txt_surface = pygame.font.Font(None, 25).render(text, True, (0, 0, 0))
         self.draw_surface.blit(txt_surface, (640, 10))
 
     def draw_highway(self):
-        #self.highway.draw_origin(self.draw_surface)
+        # self.highway.draw_origin(self.draw_surface)
         self.highway.draw_lanes(self.draw_surface)
 
     def choose_origin_point(self):
@@ -62,8 +69,6 @@ class Designer:
 
         mouse_pos = pygame.mouse.get_pos()
         pygame.draw.circle(self.draw_surface, (0, 0, 0), mouse_pos, 10)
-
-        mouse_click = pygame.mouse.get_pressed()[0]
 
         if get_mouse_clicked():
             self.highway.set_origin(mouse_pos)
@@ -76,6 +81,26 @@ class Designer:
             self.highway.complete_adding_line_segment()
             self.state = DesignerState.none
 
+    def adding_curved_segment_end_point(self):
+        self.draw_title("choose end point for curve")
+
+        mouse_pos = pygame.mouse.get_pos()
+        pygame.draw.circle(self.draw_surface, (0, 0, 0), mouse_pos, 10)
+
+    def transition_curve_control_point(self):
+        mouse_pos = pygame.mouse.get_pos()
+        self.highway.select_curve_endpoint(mouse_pos)
+        self.state = DesignerState.creatingBezierCurveControlPoint
+
+    def adding_curved_segment_control_point(self):
+        self.draw_title("choose control point for curve")
+
+        mouse_pos = pygame.mouse.get_pos()
+        pygame.draw.circle(self.draw_surface, (0, 0, 0), mouse_pos, 10)
+
+        if get_mouse_clicked():
+            self.highway.complete_adding_curve_segment(mouse_pos)
+            self.state = DesignerState.none
 
     def run(self):
         run_designer = True
@@ -93,6 +118,13 @@ class Designer:
                         self.state = DesignerState.creatingStraightLine
                         self.highway.begin_adding_line_segment()
 
+                    if self.state == DesignerState.creatingBezierCurveEndPoint:
+                        self.transition_curve_control_point()
+
+                    if self.add_curve_segment.clicked(event):
+                        self.state = DesignerState.creatingBezierCurveEndPoint
+                        self.highway.begin_adding_curve_segment()
+
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit(0)
@@ -108,6 +140,10 @@ class Designer:
                     self.choose_origin_point()
                 case DesignerState.creatingStraightLine:
                     self.adding_line_segment()
+                case DesignerState.creatingBezierCurveControlPoint:
+                    self.adding_curved_segment_control_point()
+                case DesignerState.creatingBezierCurveEndPoint:
+                    self.adding_curved_segment_end_point()
 
             pygame.display.update()
             Designer.FPSTicker.tick(Designer.SIM_FPS)

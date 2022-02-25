@@ -1,13 +1,13 @@
 from road.road import Road
+from road.type import Type
 import pygame
-from pygame.locals import *
 
 
 class StraightRoad(Road):
 
     def __init__(self, p1, p2):
 
-        Road.__init__(self, p1, p2)
+        Road.__init__(self, p1, p2, Type.straight)
         self.dir_vector = None
 
         if p2 is not None:
