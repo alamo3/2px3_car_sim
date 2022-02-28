@@ -9,6 +9,9 @@ class Road(ABC):
         self.end_p = end_p
         self.road_type = type
 
+    def points(self):
+        return [self.start_p, self.end_p]
+
     @abstractmethod
     def draw(self, surface):
         pass

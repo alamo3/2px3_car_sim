@@ -1,3 +1,5 @@
+import math
+
 from road.straight import StraightRoad
 from road.curved import CurvedRoad
 from road.type import Type
@@ -84,6 +86,20 @@ class Lane:
         lane.segments = new_segments
 
         return lane
+
+    def does_point_intersect_control_points(self, p0):
+
+        if len(self.segments) == 0:
+            return False
+
+        for segment in self.segments:
+            for p1 in segment.points():
+                sqx = (p0[0] - p1[0]) ** 2
+                sqy = (p0[1] - p1[1]) ** 2
+
+                if math.sqrt(sqx + sqy) < 10:
+                    print("Intersected point")
+                    return p1
 
     def draw_lane(self, surface):
 

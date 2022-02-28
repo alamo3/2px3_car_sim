@@ -13,6 +13,7 @@ class Button:
         self.text = text
         self.rect = pygame.Rect(self.x, self.y, self.w, self.h)
         self.txt_surface = font.render(text, True, (0, 0, 0))
+        self.is_visible = True
 
     def draw(self, surface):
         surface.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))

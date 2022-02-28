@@ -33,6 +33,8 @@ class Highway:
         self.editing_mode_curve = False
         self.temp_curve_end_point = None
 
+        self.editing_segment = False
+
         for i in range(num_lanes):
             self.lanes.append(Lane(i))
 
@@ -99,3 +101,23 @@ class Highway:
             lane.complete_temp_segment_line(lane_point)
 
         self.editing_mode = False
+
+    def does_highway_have_segments(self):
+        for lane in self.lanes:
+            if len(lane.segments) != 0:
+                return True
+
+        return False
+
+    def begin_editing_segments(self):
+        self.editing_segment = True
+
+    def does_mouse_click_intersect_point(self):
+
+        point = pygame.mouse.get_pos()
+
+        for lane in self.lanes:
+            if lane.does_point_intersect_control_points(point):
+                return True
+
+        return False

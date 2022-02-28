@@ -1,3 +1,4 @@
+import globalprops
 from road.road import Road
 from road.type import Type
 import pygame
@@ -37,7 +38,15 @@ class CurvedRoad(Road):
             self.segments.append(Line(prev_point[0], prev_point[1], point[0], point[1]))
             prev_point = point
 
+    def points(self):
+        return [self.start_p, self.control_point, self.end_p]
+
     def draw(self, surface):
+
+        if globalprops.EDITING_MODE:
+            #pygame.draw.circle(surface, (255, 0, 0), self.start_p, 10)
+            pygame.draw.circle(surface, (255, 0, 0), self.control_point, 10)
+            pygame.draw.circle(surface, (255, 0, 0), self.end_p, 10)
 
         for line in self.segments:
             pygame.draw.line(surface, (0, 255, 0), (line.x, line.y), (line.x1, line.y1))

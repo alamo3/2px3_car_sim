@@ -1,5 +1,7 @@
 import pygame
 from pygame.locals import *
+
+import globalprops
 from ui.button import Button
 from enum import Enum
 from road.highway import Highway
@@ -10,7 +12,10 @@ class DesignerState(Enum):
     choosing_origin = 1,
     creatingStraightLine = 2,
     creatingBezierCurveEndPoint = 3,
-    creatingBezierCurveControlPoint = 4
+    creatingBezierCurveControlPoint = 4,
+    selectingSegmentToEdit = 5,
+    editingLineSegment = 6,
+    editingCurveSegment = 7
 
 
 def get_mouse_clicked():
@@ -34,11 +39,12 @@ class Designer:
         self.remove_lane = None
         self.add_straight_segment = None
         self.add_curve_segment = None
+        self.edit_segments = None
         self.state = DesignerState.none
 
         self.init_menu()
 
-        self.highway = Highway(1, 70, (450, 680))
+        self.highway = Highway(1, 120, (450, 680))
 
     def init_menu(self):
         self.add_lane = Button((10, 10), (70, 20), (255, 0, 0), "Add Lane", pygame.font.Font(None, 15))
@@ -48,6 +54,7 @@ class Designer:
                                            pygame.font.Font(None, 15))
         self.add_curve_segment = Button((10, 130), (120, 20), (255, 0, 0), "Add Curved Segment",
                                         pygame.font.Font(None, 15))
+        self.edit_segments = Button((10, 160), (120, 20), (255, 0, 0), "Edit segment", pygame.font.Font(None, 15))
 
     def draw_buttons(self):
         self.add_lane.draw(self.draw_surface)
@@ -55,6 +62,11 @@ class Designer:
         self.remove_lane.draw(self.draw_surface)
         self.add_straight_segment.draw(self.draw_surface)
         self.add_curve_segment.draw(self.draw_surface)
+        if self.highway.does_highway_have_segments():
+            self.edit_segments.draw(self.draw_surface)
+            self.edit_segments.is_visible = True
+        else:
+            self.edit_segments.is_visible = False
 
     def draw_title(self, text):
         txt_surface = pygame.font.Font(None, 25).render(text, True, (0, 0, 0))
@@ -102,6 +114,12 @@ class Designer:
             self.highway.complete_adding_curve_segment(mouse_pos)
             self.state = DesignerState.none
 
+    def selecting_segment_to_edit(self):
+        self.draw_title("click and drag points to edit segments")
+
+        if get_mouse_clicked():
+            self.highway.does_mouse_click_intersect_point()
+
     def run(self):
         run_designer = True
         while run_designer:
@@ -125,6 +143,10 @@ class Designer:
                         self.state = DesignerState.creatingBezierCurveEndPoint
                         self.highway.begin_adding_curve_segment()
 
+                    if self.edit_segments.is_visible and self.edit_segments.clicked(event):
+                        self.state = DesignerState.selectingSegmentToEdit
+                        globalprops.EDITING_MODE = True
+
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit(0)
@@ -144,6 +166,9 @@ class Designer:
                     self.adding_curved_segment_control_point()
                 case DesignerState.creatingBezierCurveEndPoint:
                     self.adding_curved_segment_end_point()
+                case DesignerState.selectingSegmentToEdit:
+                    self.selecting_segment_to_edit()
+
 
             pygame.display.update()
             Designer.FPSTicker.tick(Designer.SIM_FPS)

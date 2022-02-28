@@ -1,3 +1,4 @@
+import globalprops
 from road.road import Road
 from road.type import Type
 import pygame
@@ -14,6 +15,10 @@ class StraightRoad(Road):
             self.dir_vector = (p2[0] - p1[0], p2[1] - p1[1])
 
     def draw(self, surface):
+
+        if globalprops.EDITING_MODE:
+            #pygame.draw.circle(surface, (255, 0, 0), self.start_p, 10)
+            pygame.draw.circle(surface, (255, 0, 0), self.end_p, 10)
 
         if (self.start_p is not None) and (self.end_p is not None):
             pygame.draw.line(surface, (0, 0, 255), self.start_p, self.end_p)
