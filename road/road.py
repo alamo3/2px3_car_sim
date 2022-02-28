@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from road.type import Type
+from math.Point import Point
 
 
 class Road(ABC):
 
-    def __init__(self, start_p, end_p, type: Type):
+    def __init__(self, start_p: Point, end_p: Point, type: Type):
         self.start_p = start_p
         self.end_p = end_p
         self.road_type = type

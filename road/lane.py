@@ -4,12 +4,13 @@ from road.straight import StraightRoad
 from road.curved import CurvedRoad
 from road.type import Type
 import pygame
-from pygame.locals import *
+from math.Point import Point
+from road.road import Road
 
 
-def translate_point_horizontal(point, dx):
-    lane_origin_x = point[0] + dx
-    return lane_origin_x, point[1]
+def translate_point_horizontal(point: Point, dx):
+    lane_origin_x = point.x + dx
+    return Point(lane_origin_x, point.y)
 
 
 def translate_line_segment(segment: StraightRoad, dx):
@@ -32,14 +33,14 @@ class Lane:
     def __init__(self, lane_num):
         self.segments = []
         self.lane_num = lane_num
-        self.origin_point = None
+        self.origin_point: Point = None
         self.lane_txt = pygame.font.Font(None, 15).render("Lane " + str(self.lane_num), True, (0, 0, 0))
         self.temp_segment = None
 
-    def set_origin(self, point):
+    def set_origin(self, point: Point):
         self.origin_point = point
 
-    def create_new_straight_road(self, end_point):
+    def create_new_straight_road(self, end_point: Point):
 
         if len(self.segments) == 0:
             return StraightRoad(self.origin_point, end_point)
@@ -47,25 +48,25 @@ class Lane:
             final_point = self.segments[-1].end_p
             return StraightRoad(final_point, end_point)
 
-    def create_new_curved_road(self, end_point, control_point):
+    def create_new_curved_road(self, end_point: Point, control_point: Point):
         if len(self.segments) == 0:
             return CurvedRoad(self.origin_point, control_point, end_point)
         else:
             final_point = self.segments[-1].end_p
             return CurvedRoad(final_point, control_point, end_point)
 
-    def temp_segment_curve(self, end_point, control_point):
+    def temp_segment_curve(self, end_point: Point, control_point: Point):
         self.temp_segment = self.create_new_curved_road(end_point, control_point)
 
-    def complete_temp_segment_curve(self, end_point, control_point):
+    def complete_temp_segment_curve(self, end_point: Point, control_point: Point):
         new_segment = self.create_new_curved_road(end_point, control_point)
         self.segments.append(new_segment)
         self.temp_segment = None
 
-    def temp_segment_line(self, end_point):
+    def temp_segment_line(self, end_point: Point):
         self.temp_segment = self.create_new_straight_road(end_point)
 
-    def complete_temp_segment_line(self, end_point):
+    def complete_temp_segment_line(self, end_point: Point):
         new_segment = self.create_new_straight_road(end_point)
         self.segments.append(new_segment)
         self.temp_segment = None
@@ -87,15 +88,15 @@ class Lane:
 
         return lane
 
-    def does_point_intersect_control_points(self, p0):
+    def does_point_intersect_control_points(self, p0: Point):
 
         if len(self.segments) == 0:
             return False
 
         for segment in self.segments:
             for p1 in segment.points():
-                sqx = (p0[0] - p1[0]) ** 2
-                sqy = (p0[1] - p1[1]) ** 2
+                sqx = (p0.x - p1.x) ** 2
+                sqy = (p0.y - p1.y) ** 2
 
                 if math.sqrt(sqx + sqy) < 10:
                     print("Intersected point")
@@ -104,8 +105,8 @@ class Lane:
     def draw_lane(self, surface):
 
         if self.origin_point is not None:
-            pygame.draw.circle(surface, (0, 0, 0), self.origin_point, 10.0)
-            surface.blit(self.lane_txt, (self.origin_point[0] - 10, self.origin_point[1] + 12))
+            pygame.draw.circle(surface, (0, 0, 0), self.origin_point.get_tuple(), 10.0)
+            surface.blit(self.lane_txt, (self.origin_point.x - 10, self.origin_point.y + 12))
 
         for segment in self.segments:
             segment.draw(surface)

@@ -1,6 +1,7 @@
 import pygame.draw
 
 from road.lane import Lane
+from math.Point import Point
 
 
 def create_temp_straight_segment(lane, lane_width):
@@ -117,7 +118,10 @@ class Highway:
         point = pygame.mouse.get_pos()
 
         for lane in self.lanes:
-            if lane.does_point_intersect_control_points(point):
+            p1 = lane.does_point_intersect_control_points(Point(point[0], point[1]))
+            if p1 is not None:
+                p1.x = point[0]
+                p1.y = point[1]
                 return True
 
         return False
