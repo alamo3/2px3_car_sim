@@ -2,7 +2,7 @@ import globalprops
 from road.road import Road
 from road.type import Type
 import pygame
-from math.Point import Point
+from geometry.Point import Point
 
 
 class StraightRoad(Road):

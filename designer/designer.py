@@ -29,7 +29,7 @@ class Designer:
     def __init__(self):
 
         pygame.init()
-        self.draw_surface = pygame.display.set_mode((1280, 720))
+        self.draw_surface = pygame.display.set_mode((1920, 900))
         self.draw_surface.fill((255, 255, 255))
         pygame.display.set_caption("Road Designer Self-driving #26")
 
@@ -44,7 +44,7 @@ class Designer:
 
         self.init_menu()
 
-        self.highway = Highway(1, 120, (450, 680))
+        self.highway = Highway(1, 40, (50, 870))
 
     def init_menu(self):
         self.add_lane = Button((10, 10), (70, 20), (255, 0, 0), "Add Lane", pygame.font.Font(None, 15))
@@ -54,7 +54,7 @@ class Designer:
                                            pygame.font.Font(None, 15))
         self.add_curve_segment = Button((10, 130), (120, 20), (255, 0, 0), "Add Curved Segment",
                                         pygame.font.Font(None, 15))
-        self.edit_segments = Button((10, 160), (120, 20), (255, 0, 0), "Edit segment", pygame.font.Font(None, 15))
+        self.edit_segments = Button((10, 160), (120, 20), (255, 0, 0), "Edit segments", pygame.font.Font(None, 15))
 
     def draw_buttons(self):
         self.add_lane.draw(self.draw_surface)
@@ -63,6 +63,12 @@ class Designer:
         self.add_straight_segment.draw(self.draw_surface)
         self.add_curve_segment.draw(self.draw_surface)
         if self.highway.does_highway_have_segments():
+
+            if self.state == DesignerState.selectingSegmentToEdit:
+                self.edit_segments.update_text("Finish Editing")
+            else:
+                self.edit_segments.update_text("Edit Segments")
+
             self.edit_segments.draw(self.draw_surface)
             self.edit_segments.is_visible = True
         else:
@@ -132,18 +138,22 @@ class Designer:
                     if self.choose_origin.clicked(event):
                         self.state = DesignerState.choosing_origin
 
-                    if self.add_straight_segment.clicked(event):
+                    elif self.add_straight_segment.clicked(event):
                         self.state = DesignerState.creatingStraightLine
                         self.highway.begin_adding_line_segment()
 
-                    if self.state == DesignerState.creatingBezierCurveEndPoint:
+                    elif self.state == DesignerState.creatingBezierCurveEndPoint:
                         self.transition_curve_control_point()
 
-                    if self.add_curve_segment.clicked(event):
+                    elif self.add_curve_segment.clicked(event):
                         self.state = DesignerState.creatingBezierCurveEndPoint
                         self.highway.begin_adding_curve_segment()
 
-                    if self.edit_segments.is_visible and self.edit_segments.clicked(event):
+                    elif self.state == DesignerState.selectingSegmentToEdit and self.edit_segments.clicked(event):
+                        self.state = DesignerState.none
+                        globalprops.EDITING_MODE = False
+
+                    elif self.edit_segments.is_visible and self.edit_segments.clicked(event):
                         self.state = DesignerState.selectingSegmentToEdit
                         globalprops.EDITING_MODE = True
 
@@ -157,7 +167,7 @@ class Designer:
 
             match self.state:
                 case DesignerState.none:
-                    pass
+                    globalprops.EDITING_MODE = False
                 case DesignerState.choosing_origin:
                     self.choose_origin_point()
                 case DesignerState.creatingStraightLine:

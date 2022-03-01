@@ -1,25 +1,25 @@
 import pygame.draw
 
 from road.lane import Lane
-from math.Point import Point
+from geometry.Point import Point
 
 
 def create_temp_straight_segment(lane, lane_width):
     mouse_pos = pygame.mouse.get_pos()
-    end_point = translate_point_for_lane(mouse_pos, lane.lane_num, lane_width)
+    end_point = translate_point_for_lane(Point.t2p(mouse_pos), lane.lane_num, lane_width)
     lane.temp_segment_line(end_point)
 
 
-def create_temp_curved_segment(lane, lane_width, end_point):
+def create_temp_curved_segment(lane, lane_width, end_point: Point):
     mouse_pos = pygame.mouse.get_pos()
     end_point_lane = translate_point_for_lane(end_point, lane.lane_num, lane_width)
-    control_point_lane = translate_point_for_lane(mouse_pos, lane.lane_num, lane_width)
+    control_point_lane = translate_point_for_lane(Point.t2p(mouse_pos), lane.lane_num, lane_width)
     lane.temp_segment_curve(end_point_lane, control_point_lane)
 
 
-def translate_point_for_lane(point, lane_num, lane_width):
-    lane_origin_x = point[0] + (lane_width * lane_num)
-    return lane_origin_x, point[1]
+def translate_point_for_lane(point: Point, lane_num, lane_width):
+    lane_origin_x = point.x + (lane_width * lane_num)
+    return Point(lane_origin_x, point.y)
 
 
 class Highway:
@@ -45,10 +45,10 @@ class Highway:
 
         for i in range(len(self.lanes)):
             lane = self.lanes[i]
-            lane_origin = translate_point_for_lane(point, i, self.lane_width)
+            lane_origin = translate_point_for_lane(Point.t2p(point), i, self.lane_width)
             lane.set_origin(lane_origin)
 
-        self.origin_point = point
+        self.origin_point = Point.t2p(point)
 
     def add_lane(self):
         self.num_lanes = self.num_lanes + 1
@@ -73,7 +73,7 @@ class Highway:
             if self.editing_mode:
                 create_temp_straight_segment(self.lanes[i], self.lane_width)
             elif self.editing_mode_curve and self.temp_curve_end_point is not None:
-                create_temp_curved_segment(self.lanes[i], self.lane_width, self.temp_curve_end_point)
+                create_temp_curved_segment(self.lanes[i], self.lane_width, Point.t2p(self.temp_curve_end_point))
             self.lanes[i].draw_lane(surface)
 
     def begin_adding_line_segment(self):
@@ -87,8 +87,8 @@ class Highway:
 
     def complete_adding_curve_segment(self, point):
         for lane in self.lanes:
-            end_point = translate_point_for_lane(self.temp_curve_end_point, lane.lane_num, self.lane_width)
-            control_point = translate_point_for_lane(point, lane.lane_num, self.lane_width)
+            end_point = translate_point_for_lane(Point.t2p(self.temp_curve_end_point), lane.lane_num, self.lane_width)
+            control_point = translate_point_for_lane(Point.t2p(point), lane.lane_num, self.lane_width)
             lane.complete_temp_segment_curve(end_point, control_point)
 
         self.editing_mode_curve = False
@@ -98,7 +98,7 @@ class Highway:
 
         point = pygame.mouse.get_pos()
         for lane in self.lanes:
-            lane_point = translate_point_for_lane(point, lane.lane_num, self.lane_width)
+            lane_point = translate_point_for_lane(Point.t2p(point), lane.lane_num, self.lane_width)
             lane.complete_temp_segment_line(lane_point)
 
         self.editing_mode = False
@@ -118,7 +118,7 @@ class Highway:
         point = pygame.mouse.get_pos()
 
         for lane in self.lanes:
-            p1 = lane.does_point_intersect_control_points(Point(point[0], point[1]))
+            p1 = lane.does_point_intersect_control_points(Point.t2p(point))
             if p1 is not None:
                 p1.x = point[0]
                 p1.y = point[1]

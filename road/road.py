@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from road.type import Type
-from math.Point import Point
+from geometry.Point import Point
 
 
 class Road(ABC):
