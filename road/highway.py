@@ -2,6 +2,7 @@ import pygame.draw
 
 from road.lane import Lane
 from geometry.Point import Point
+from geometry.utils import Utils
 
 
 def create_temp_straight_segment(lane, lane_width):
@@ -28,6 +29,9 @@ class Highway:
         self.num_lanes = num_lanes
         self.lane_width = lane_width
         self.lanes = []
+        self.entry_ramps = []
+        self.exit_ramps = []
+
         self.editing_mode = False
         self.origin_point = None
 
@@ -112,6 +116,16 @@ class Highway:
 
     def begin_editing_segments(self):
         self.editing_segment = True
+
+    def get_lane_by_mouse_click(self):
+
+        point = pygame.mouse.get_pos()
+        p0 = Point.t2p(point)
+
+        for lane in self.lanes:
+            origin_lane = lane.origin_point
+            if Utils.does_point_lie_in_circle(p0, origin_lane, 10):
+                return lane
 
     def does_mouse_click_intersect_point(self):
 

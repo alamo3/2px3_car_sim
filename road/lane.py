@@ -1,5 +1,3 @@
-import geometry
-
 from road.straight import StraightRoad
 from road.curved import CurvedRoad
 from road.type import Type
@@ -7,6 +5,7 @@ import pygame
 from geometry.Point import Point
 from road.road import Road
 import math
+from geometry.utils import Utils
 
 
 def translate_point_horizontal(point: Point, dx):
@@ -105,11 +104,8 @@ class Lane:
 
         for segment in self.segments:
             for p1 in segment.points():
-                sqx = (p0.x - p1.x) ** 2
-                sqy = (p0.y - p1.y) ** 2
 
-                if math.sqrt(sqx + sqy) < 10:
-                    print("Intersected point")
+                if Utils.does_point_lie_in_circle(p0, p1, 10):
                     return p1
 
     def draw_lane(self, surface):
