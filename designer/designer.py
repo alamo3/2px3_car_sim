@@ -16,6 +16,7 @@ class DesignerState(Enum):
     editingSegments = 5,
     selectEntryRampLane = 6,
     selectEntryRampOrigin = 7,
+    addingRampSegments = 8,
 
 
 def get_mouse_clicked():
@@ -146,9 +147,14 @@ class Designer:
     def select_entry_origin(self):
         self.draw_title("select origin point for entry ramp")
 
+        mouse_pos = pygame.mouse.get_pos()
+        pygame.draw.circle(self.draw_surface, (0, 0, 0), mouse_pos, 10)
+
     def complete_entry_origin(self):
 
         mouse_pos = pygame.mouse.get_pos()
+        self.highway.on_ramp_editing_mode(mouse_pos)
+        self.state = DesignerState.addingRampSegments
 
 
 
@@ -190,7 +196,7 @@ class Designer:
                         self.transition_entry_origin_point()
 
                     elif self.state == DesignerState.selectEntryRampOrigin:
-
+                        self.complete_entry_origin()
 
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -217,6 +223,7 @@ class Designer:
                     self.select_lane()
                 case DesignerState.selectEntryRampOrigin:
                     self.select_entry_origin()
+
 
 
             pygame.display.update()
