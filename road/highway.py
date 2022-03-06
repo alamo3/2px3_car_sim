@@ -1,6 +1,7 @@
 import pygame.draw
 
 from road.lane import Lane
+from road.ramp import Ramp
 from geometry.Point import Point
 from geometry.utils import Utils
 
@@ -23,9 +24,6 @@ def translate_point_for_lane(point: Point, lane_num, lane_width):
     return Point(lane_origin_x, point.y)
 
 
-ON_RAMP_OFFSET = 10
-
-
 class Highway:
 
     def __init__(self, num_lanes, lane_width, origin_point):
@@ -41,8 +39,6 @@ class Highway:
         self.editing_mode_curve = False
         self.temp_curve_end_point = None
         self.ramp_editing_mode = None
-
-        self.editing_segment = False
 
         for i in range(num_lanes):
             self.lanes.append(Lane(i))
@@ -160,9 +156,6 @@ class Highway:
 
         return False
 
-    def begin_editing_segments(self):
-        self.editing_segment = True
-
     def get_lane_by_mouse_click(self):
 
         point = pygame.mouse.get_pos()
@@ -173,22 +166,18 @@ class Highway:
             if Utils.does_point_lie_in_circle(p0, origin_lane, 10):
                 return lane
 
-    def does_mouse_click_intersect_point(self):
+    def intersect_mouse_click_lane(self):
 
         point = pygame.mouse.get_pos()
 
         for lane in self.lanes:
             p1 = lane.does_point_intersect_control_points(Point.t2p(point))
             if p1 is not None:
-                p1.x = point[0]
-                p1.y = point[1]
-                return True
+                return p1
 
-        return False
-
-    def on_ramp_editing_mode(self, point):
+    def on_ramp_editing_mode(self, point, lane):
         self.ramp_editing_mode = True
-        entry_ramp = Lane(ON_RAMP_OFFSET + len(self.entry_ramps))
+        entry_ramp = Ramp(len(self.entry_ramps), lane)
         entry_ramp.set_origin(Point.t2p(point))
         self.entry_ramps.append(entry_ramp)
 

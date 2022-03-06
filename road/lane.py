@@ -3,29 +3,7 @@ from road.curved import CurvedRoad
 from road.type import Type
 import pygame
 from geometry.Point import Point
-from road.road import Road
-import math
 from geometry.utils import Utils
-
-
-def translate_point_horizontal(point: Point, dx):
-    lane_origin_x = point.x + dx
-    return Point(lane_origin_x, point.y)
-
-
-def translate_line_segment(segment: StraightRoad, dx):
-    new_start = translate_point_horizontal(segment.start_p, dx)
-    new_end = translate_point_horizontal(segment.end_p, dx)
-
-    return StraightRoad(new_start, new_end)
-
-
-def translate_curved_segment(segment: CurvedRoad, dx):
-    new_start = translate_point_horizontal(segment.start_p, dx)
-    new_end = translate_point_horizontal(segment.end_p, dx)
-    new_control = translate_point_horizontal(segment.control_point, dx)
-
-    return CurvedRoad(new_start, new_control, new_end)
 
 
 class Lane:
@@ -81,10 +59,10 @@ class Lane:
         new_segments = []
         for segment in self.segments:
             if segment.road_type == Type.straight:
-                new_segment = translate_line_segment(segment, dx)
+                new_segment = Utils.translate_line_segment(segment, dx)
 
             else:
-                new_segment = translate_curved_segment(segment, dx)
+                new_segment = Utils.translate_curved_segment(segment, dx)
 
             if not len(new_segments) == 0:
                 last_segment = new_segments[-1]
@@ -92,7 +70,7 @@ class Lane:
 
             new_segments.append(new_segment)
 
-        lane.origin_point = translate_point_horizontal(self.origin_point, dx)
+        lane.origin_point = Utils.translate_point_horizontal(self.origin_point, dx)
         lane.segments = new_segments
 
         return lane
