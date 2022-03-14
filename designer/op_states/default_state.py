@@ -12,10 +12,12 @@ class DefaultState(DesignerState):
     def __init__(self, designer):
         DesignerState.__init__(self, designer)
         self.show_buttons = [ButtonIdent.add_lane, ButtonIdent.remove_lane, ButtonIdent.select_origin,
-                             ButtonIdent.add_straight_seg, ButtonIdent.add_curve_seg, ButtonIdent.add_entry_ramp]
+                             ButtonIdent.add_straight_seg, ButtonIdent.add_curve_seg]
 
         if designer.highway.does_highway_have_segments():
             self.show_buttons.append(ButtonIdent.edit_segs)
+            self.show_buttons.append(ButtonIdent.add_entry_ramp)
+            self.show_buttons.append(ButtonIdent.save_highway)
 
         self.set_button_visibility()
 
@@ -33,7 +35,8 @@ class DefaultState(DesignerState):
             self.designer.designer_state_new = el.EditingLanes(self.designer)
         elif button_ident == ButtonIdent.add_entry_ramp:
             self.designer.designer_state_new = ae.AddingEntryRamp(self.designer)
-
+        elif button_ident == ButtonIdent.save_highway:
+            self.designer.highway.save_highway()
 
     def handle_mouse_press(self, button):
         pass

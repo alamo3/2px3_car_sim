@@ -1,3 +1,5 @@
+import json
+
 import pygame.draw
 
 from road.lane import Lane
@@ -183,3 +185,7 @@ class Highway:
 
     def finish_ramp_editing(self):
         self.ramp_editing_mode = False
+
+    def save_highway(self, file_name="highway_1.txt"):
+        json_str = json.dumps(self.__dict__)
+        print(json_str)

@@ -69,6 +69,9 @@ class Designer:
         self.buttons.append(Button((10, 250), (120, 20), (255, 0, 0), "Complete On Ramp", pygame.font.Font(None, 15),
                                    ButtonIdent.complete_entry_ramp))
 
+        self.buttons.append(Button((10, 250), (120, 20), (255, 0, 0), "Save Highway", pygame.font.Font(None, 15),
+                                   ButtonIdent.save_highway))
+
     def draw_buttons(self):
 
         # draw buttons if they are visible. appropriate co-ordinates set by states
