@@ -171,9 +171,15 @@ class Highway:
     def intersect_mouse_click_lane(self):
 
         point = pygame.mouse.get_pos()
+        p0 = Point.t2p(point)
 
         for lane in self.lanes:
-            p1 = lane.does_point_intersect_control_points(Point.t2p(point))
+            p1 = lane.does_point_intersect_control_points(p0)
+            if p1 is not None:
+                return p1
+
+        for ramp in self.entry_ramps:
+            p1 = ramp.does_point_intersect_control_points(p0)
             if p1 is not None:
                 return p1
 
@@ -186,6 +192,23 @@ class Highway:
     def finish_ramp_editing(self):
         self.ramp_editing_mode = False
 
-    def save_highway(self, file_name="highway_1.txt"):
-        json_str = json.dumps(self.__dict__)
-        print(json_str)
+    def save_highway(self, file_name="highway_1.json"):
+        highway_dict = {"num_lanes": self.num_lanes, "lane_width": self.lane_width,
+                        "origin_point": self.origin_point.toString()}
+
+        for lane in self.lanes:
+            lane_dict = lane.export()
+            highway_dict["lane_"+str(lane.lane_num)] = lane_dict
+
+        highway_dict["num_ramps"] = len(self.entry_ramps)
+
+        for ramp in self.entry_ramps:
+            ramp_dict = ramp.export()
+            highway_dict["onramp_"+str(ramp.lane_num)] = ramp_dict
+
+        out_dict = {"highway": highway_dict, "_comment": "Self-driving #26!!!!"}
+
+        with open(file_name, 'w') as outfile:
+            json.dump(out_dict, outfile, indent=4)
+
+

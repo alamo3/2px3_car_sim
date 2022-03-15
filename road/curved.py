@@ -52,3 +52,6 @@ class CurvedRoad(Road):
 
         for line in self.segments:
             pygame.draw.line(surface, (0, 255, 0), (line.x, line.y), (line.x1, line.y1))
+
+    def export(self):
+        return "CURVED,"+self.start_p.toString()+","+self.control_point.toString()+","+self.end_p.toString()

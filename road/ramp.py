@@ -13,3 +13,6 @@ class Ramp(Lane):
         Lane.__init__(self, lane_num)
         self.lane_txt = pygame.font.Font(None, 15).render("Ramp " + str(self.lane_num), True, (0, 0, 0))
         self.attaching_lane = attaching_lane
+
+
+

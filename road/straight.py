@@ -18,10 +18,11 @@ class StraightRoad(Road):
     def draw(self, surface):
 
         if globalprops.EDITING_MODE:
-            #pygame.draw.circle(surface, (255, 0, 0), self.start_p, 10)
+            # pygame.draw.circle(surface, (255, 0, 0), self.start_p, 10)
             pygame.draw.circle(surface, (255, 0, 0), self.end_p.get_tuple(), 10)
 
         if (self.start_p is not None) and (self.end_p is not None):
             pygame.draw.line(surface, (0, 0, 255), self.start_p.get_tuple(), self.end_p.get_tuple())
 
-
+    def export(self):
+        return "STRAIGHT,"+self.start_p.toString() + "," + self.end_p.toString()

@@ -14,5 +14,9 @@ class Road(ABC):
         return [self.start_p, self.end_p]
 
     @abstractmethod
+    def export(self):
+        pass
+
+    @abstractmethod
     def draw(self, surface):
         pass

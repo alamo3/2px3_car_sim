@@ -97,3 +97,14 @@ class Lane:
 
         if self.temp_segment is not None:
             self.temp_segment.draw(surface)
+
+    def export(self):
+        lane_dict = {"segment_num": len(self.segments)}
+        segments_dict = {}
+        for i in range(len(self.segments)):
+            segments_dict["segment_"+str(i)] = self.segments[i].export()
+
+        lane_dict["segments"] = segments_dict
+
+        return lane_dict
+

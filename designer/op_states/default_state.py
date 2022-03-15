@@ -5,6 +5,7 @@ import designer.op_states.editing_lanes as el
 import designer.op_states.adding_entry as ae
 from designer.op_states.state import DesignerState
 from ui.button_ident import ButtonIdent
+from tkinter.filedialog import asksaveasfile
 
 
 class DefaultState(DesignerState):
@@ -36,7 +37,14 @@ class DefaultState(DesignerState):
         elif button_ident == ButtonIdent.add_entry_ramp:
             self.designer.designer_state_new = ae.AddingEntryRamp(self.designer)
         elif button_ident == ButtonIdent.save_highway:
-            self.designer.highway.save_highway()
+            self.export_highway()
+
+    def export_highway(self):
+
+        files = [('JSON', '*.json')]
+
+        file = asksaveasfile(filetypes=files, defaultextension=files)
+        self.designer.highway.save_highway(file.name)
 
     def handle_mouse_press(self, button):
         pass
@@ -46,5 +54,3 @@ class DefaultState(DesignerState):
 
     def draw(self, surface):
         pass
-
-
