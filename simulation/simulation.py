@@ -1,15 +1,32 @@
 import pygame
 from pygame.locals import *
 
-class Simulation:
+from ui.button_ident import ButtonIdent
+from ui.window import Window
+from ui.button import Button
 
-    SIM_FPS = 30
-    FPSTicker = pygame.time.Clock()
+
+class Simulation(Window):
 
     def __init__(self):
-        self.draw_surface = pygame.display.set_mode((1280, 720))
-        self.draw_surface.fill((255,255,255))
-        pygame.display.set_caption("Simulation Self-driving #26")
+        Window.__init__(self, "Self-Driving #26 Highway Simulator")
+
+        self.title = "HIGHWAY SIMULATOR"
+
+        self.init_window()
+
+    def init_window(self):
+        self.buttons.append(Button((10, 10), (90, 20), (255, 0, 0), "Load Highway", pygame.font.Font(None, 15),
+                                   ButtonIdent.load_highway))
 
     def run(self):
-        pass
+        while True:
+
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    super().quit()
+
+            super().draw()
+
+            super().run()

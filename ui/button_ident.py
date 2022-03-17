@@ -12,4 +12,5 @@ class ButtonIdent(Enum):
     complete_editing = 8,
     complete_entry_ramp = 9,
     save_highway = 10,
+    load_highway = 11
 

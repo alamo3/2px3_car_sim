@@ -2,35 +2,24 @@ import pygame
 
 from ui.button_ident import ButtonIdent
 from ui.button import Button
+from ui.window import Window
+from ui.window import get_mouse_clicked
 
 from road.highway import Highway
 from designer.op_states.default_state import DefaultState
 
 
-# static function to get if left mouse button is pressed
-def get_mouse_clicked():
-    return pygame.mouse.get_pressed()[0]
-
-
 # main designer class which acts as a context for our state objects
-class Designer:
-    SIM_FPS = 30  # simulator runs at 30 fps
-    FPSTicker = pygame.time.Clock()  # create pygame fps clock
+class Designer(Window):
 
     def __init__(self):
 
-        # set up pygame window rendering
-        pygame.init()
-        self.draw_surface = pygame.display.set_mode((1920, 900))
-        self.draw_surface.fill((255, 255, 255))
-        pygame.display.set_caption("Road Designer Self-driving #26")
+        Window.__init__(self, "Road Designer Self-driving #26")
 
         # initial title
         self.title = "ROAD DESIGNER"
 
-        # buttons
-        self.buttons = []
-        self.init_menu()
+        self.init_window()
 
         # create our highway
         self.highway = Highway(1, 40, (50, 870))
@@ -42,7 +31,7 @@ class Designer:
         self.designer_state_new = None
 
     # initialize menu buttons. Locations provided here are somewhat irrelevant since they are refreshed with new states.
-    def init_menu(self):
+    def init_window(self):
         self.buttons.append(Button((10, 10), (70, 20), (255, 0, 0), "Add Lane", pygame.font.Font(None, 15),
                                    ButtonIdent.add_lane))
         self.buttons.append(Button((10, 40), (90, 20), (255, 0, 0), "Remove Lane", pygame.font.Font(None, 15),
@@ -72,17 +61,6 @@ class Designer:
         self.buttons.append(Button((10, 250), (120, 20), (255, 0, 0), "Save Highway", pygame.font.Font(None, 15),
                                    ButtonIdent.save_highway))
 
-    def draw_buttons(self):
-
-        # draw buttons if they are visible. appropriate co-ordinates set by states
-        for button in self.buttons:
-            if button.is_visible:
-                button.draw(self.draw_surface)
-
-    def draw_title(self):
-        txt_surface = pygame.font.Font(None, 25).render(self.title, True, (0, 0, 0))
-        self.draw_surface.blit(txt_surface, (640, 10))
-
     def draw_highway(self):
         self.highway.draw_lanes(self.draw_surface)
 
@@ -97,8 +75,7 @@ class Designer:
                         self.designer_state.handle_click(button.ident)
 
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit(0)
+                    super().quit()
 
             if get_mouse_clicked():  # pass on mouse being clicked to the active state (never used)
                 self.designer_state.handle_mouse_press(0)
@@ -108,11 +85,9 @@ class Designer:
                 self.designer_state_new = None
 
             # fill surface with white and draw items sequentially: title, buttons, highway, state-specific drawing
-            self.draw_surface.fill((255, 255, 255))
-            self.draw_title()
-            self.draw_buttons()
+            super().draw()
+
             self.draw_highway()
             self.designer_state.draw(self.draw_surface)
 
-            pygame.display.update()  # update the display and delay if necessary for locked FPS
-            Designer.FPSTicker.tick(Designer.SIM_FPS)
+            super().run()
