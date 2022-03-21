@@ -28,7 +28,7 @@ def translate_point_for_lane(point: Point, lane_num, lane_width):
 
 class Highway:
 
-    def __init__(self, num_lanes, lane_width, origin_point):
+    def __init__(self, num_lanes=1, lane_width=70, origin_point=(50, 870)):
         self.num_lanes = num_lanes
         self.lane_width = lane_width
         self.lanes = []
@@ -74,7 +74,8 @@ class Highway:
         if self.editing_mode:
             create_temp_straight_segment(entry_ramp, self.lane_width, translate=False)
         elif self.editing_mode_curve and self.temp_curve_end_point is not None:
-            create_temp_curved_segment(entry_ramp, self.lane_width, Point.t2p(self.temp_curve_end_point), translate=False)
+            create_temp_curved_segment(entry_ramp, self.lane_width, Point.t2p(self.temp_curve_end_point),
+                                       translate=False)
 
     def draw_temp_lanes(self):
 
@@ -112,8 +113,10 @@ class Highway:
         self.temp_curve_end_point = point
 
     def complete_curved_segment_lane(self, lane, point, translate=True):
-        end_point = translate_point_for_lane(Point.t2p(self.temp_curve_end_point), lane.lane_num, self.lane_width) if translate else Point.t2p(self.temp_curve_end_point)
-        control_point = translate_point_for_lane(Point.t2p(point), lane.lane_num, self.lane_width) if translate else Point.t2p(point)
+        end_point = translate_point_for_lane(Point.t2p(self.temp_curve_end_point), lane.lane_num,
+                                             self.lane_width) if translate else Point.t2p(self.temp_curve_end_point)
+        control_point = translate_point_for_lane(Point.t2p(point), lane.lane_num,
+                                                 self.lane_width) if translate else Point.t2p(point)
         lane.complete_temp_segment_curve(end_point, control_point)
 
     def complete_adding_curve_segment_ramp(self, point):
@@ -198,17 +201,25 @@ class Highway:
 
         for lane in self.lanes:
             lane_dict = lane.export()
-            highway_dict["lane_"+str(lane.lane_num)] = lane_dict
+            highway_dict["lane_" + str(lane.lane_num)] = lane_dict
 
         highway_dict["num_ramps"] = len(self.entry_ramps)
 
         for ramp in self.entry_ramps:
             ramp_dict = ramp.export()
-            highway_dict["onramp_"+str(ramp.lane_num)] = ramp_dict
+            highway_dict["onramp_" + str(ramp.lane_num)] = ramp_dict
 
         out_dict = {"highway": highway_dict, "_comment": "Self-driving #26!!!!"}
 
         with open(file_name, 'w') as outfile:
             json.dump(out_dict, outfile, indent=4)
 
+    def load_highway(self, file_name):
 
+        file = open(file_name)
+
+        data = json.load(file)
+
+        highway_dict = data['highway']
+
+        self.num_lanes = highway_dict['num_lanes']

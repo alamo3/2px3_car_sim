@@ -22,7 +22,7 @@ class Designer(Window):
         self.init_window()
 
         # create our highway
-        self.highway = Highway(1, 40, (50, 870))
+        self.highway = Highway()
 
         # create default state
         self.designer_state = DefaultState(self)

@@ -5,6 +5,8 @@ from ui.button_ident import ButtonIdent
 from ui.window import Window
 from ui.button import Button
 
+from road.highway import Highway
+
 
 class Simulation(Window):
 
@@ -15,9 +17,14 @@ class Simulation(Window):
 
         self.init_window()
 
+        self.highway = Highway()
+
     def init_window(self):
         self.buttons.append(Button((10, 10), (90, 20), (255, 0, 0), "Load Highway", pygame.font.Font(None, 15),
                                    ButtonIdent.load_highway))
+
+    def draw_highway(self):
+        self.highway.draw_lanes(self.draw_surface)
 
     def run(self):
         while True:
@@ -28,5 +35,7 @@ class Simulation(Window):
                     super().quit()
 
             super().draw()
+
+            self.draw_highway()
 
             super().run()
