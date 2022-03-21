@@ -47,6 +47,11 @@ class Highway:
 
         self.lanes.append(new_lane)
 
+    def remove_lane(self, lane_num):
+
+        self.lanes = [lane for lane in self.lanes if lane.lane_num != lane_num]
+        self.entry_ramps = [ramp for ramp in self.entry_ramps if ramp.attaching_lane != lane_num]
+
     def draw_origin(self, surface):
         pygame.draw.circle(surface, (0, 0, 0), self.origin_point, 10)
 
@@ -170,7 +175,7 @@ class Highway:
 
     def on_ramp_editing_mode(self, point, lane):
         self.ramp_editing_mode = True
-        entry_ramp = Ramp(len(self.entry_ramps), lane)
+        entry_ramp = Ramp(len(self.entry_ramps), lane.lane_num)
         entry_ramp.set_origin(Point.t2p(point))
         self.entry_ramps.append(entry_ramp)
 
