@@ -14,5 +14,12 @@ class Ramp(Lane):
         self.lane_txt = pygame.font.Font(None, 15).render("Ramp " + str(self.lane_num), True, (0, 0, 0))
         self.attaching_lane = attaching_lane
 
+    def export(self):
+        lane_dict = super().export()
+        lane_dict["attaching_lane"] = self.attaching_lane
+
+        return lane_dict
+
+
 
 

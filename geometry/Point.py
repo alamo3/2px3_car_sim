@@ -18,3 +18,7 @@ class Point:
     def string2point(string: str):
         list_int = string.split(',')
         return Point(int(list_int[0]), int(list_int[1]))
+
+    @staticmethod
+    def list2point(list_point):
+        return Point(int(list_point[0]), int(list_point[1]))

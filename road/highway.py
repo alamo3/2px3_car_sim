@@ -22,7 +22,7 @@ class Highway:
 
         self.editing_mode_curve = False
         self.temp_curve_end_point = None
-        self.ramp_editing_mode = None
+        self.ramp_editing_mode = False
 
         for i in range(num_lanes):
             self.lanes.append(Lane(i))
@@ -198,6 +198,8 @@ class Highway:
 
     def load_highway(self, file_name):
 
+        self.lanes = []
+
         file = open(file_name)
 
         data = json.load(file)
@@ -207,3 +209,17 @@ class Highway:
         self.num_lanes = highway_dict['num_lanes']
         self.lane_width = highway_dict["lane_width"]
         self.origin_point = Point.string2point(highway_dict["origin_point"])
+
+        for i in range(self.num_lanes):
+            new_lane = Lane(i)
+            new_lane.load(highway_dict["lane_"+str(i)])
+            self.lanes.append(new_lane)
+
+        for i in range(highway_dict["num_ramps"]):
+            ramp_dict = highway_dict["onramp_"+str(i)]
+            attaching_lane = ramp_dict["attaching_lane"]
+            new_ramp = Ramp(i, attaching_lane)
+            new_ramp.load(ramp_dict)
+            self.entry_ramps.append(new_ramp)
+
+        file.close()

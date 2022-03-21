@@ -99,12 +99,28 @@ class Lane:
             self.temp_segment.draw(surface)
 
     def export(self):
-        lane_dict = {"segment_num": len(self.segments)}
+        lane_dict = {"segment_num": len(self.segments), "origin_point": self.origin_point.toString()}
         segments_dict = {}
         for i in range(len(self.segments)):
-            segments_dict["segment_"+str(i)] = self.segments[i].export()
+            segments_dict["segment_" + str(i)] = self.segments[i].export()
 
         lane_dict["segments"] = segments_dict
 
         return lane_dict
+
+    def load(self, lane_dict):
+
+        origin_point = Point.string2point(lane_dict["origin_point"])
+        self.set_origin(origin_point)
+
+        segments_dict = lane_dict["segments"]
+
+        for i in range(lane_dict["segment_num"]):
+            segment_info = segments_dict["segment_" + str(i)].split(",")
+
+            if segment_info[0] == "STRAIGHT":
+                self.complete_temp_segment_line(Point.list2point(segment_info[3:5]))
+            elif segment_info[0] == "CURVED":
+                self.complete_temp_segment_curve(Point.list2point(segment_info[5:7]),
+                                                 Point.list2point(segment_info[3:5]))
 
