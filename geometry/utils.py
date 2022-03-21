@@ -1,5 +1,8 @@
+import pygame.mouse
+
 from geometry.Point import Point
 import math
+
 from road.straight import StraightRoad
 from road.curved import CurvedRoad
 
@@ -37,3 +40,21 @@ class Utils:
         new_control = Utils.translate_point_horizontal(segment.control_point, dx)
 
         return CurvedRoad(new_start, new_control, new_end)
+
+    @staticmethod
+    def create_temp_straight_segment(lane, lane_width, translate=True):
+        mouse_pos = Point.t2p(pygame.mouse.get_pos())
+        end_point = Utils.translate_point_for_lane(mouse_pos, lane.lane_num, lane_width) if translate else mouse_pos
+        lane.temp_segment_line(end_point)
+
+    @staticmethod
+    def create_temp_curved_segment(lane, lane_width, end_point: Point, translate=True):
+        mouse_pos = Point.t2p(pygame.mouse.get_pos())
+        end_point_lane = Utils.translate_point_for_lane(end_point, lane.lane_num, lane_width) if translate else end_point
+        control_point_lane = Utils.translate_point_for_lane(mouse_pos, lane.lane_num, lane_width) if translate else mouse_pos
+        lane.temp_segment_curve(end_point_lane, control_point_lane)
+
+    @staticmethod
+    def translate_point_for_lane(point: Point, lane_num, lane_width):
+        lane_origin_x = point.x + (lane_width * lane_num)
+        return Point(lane_origin_x, point.y)

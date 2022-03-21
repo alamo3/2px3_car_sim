@@ -12,7 +12,7 @@ class DefaultState(DesignerState):
 
     def __init__(self, designer):
         DesignerState.__init__(self, designer)
-        self.show_buttons = [ButtonIdent.add_lane, ButtonIdent.remove_lane, ButtonIdent.select_origin,
+        self.show_buttons = [ButtonIdent.add_lane, ButtonIdent.select_origin,
                              ButtonIdent.add_straight_seg, ButtonIdent.add_curve_seg]
 
         if designer.highway.does_highway_have_segments():
