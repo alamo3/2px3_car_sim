@@ -6,6 +6,7 @@ import designer.op_states.adding_entry as ae
 from designer.op_states.state import DesignerState
 from ui.button_ident import ButtonIdent
 from tkinter.filedialog import asksaveasfile
+from tkinter import messagebox
 
 
 class DefaultState(DesignerState):
@@ -41,10 +42,14 @@ class DefaultState(DesignerState):
 
     def export_highway(self):
 
-        files = [('JSON', '*.json')]
+        try:
+            files = [('JSON', '*.json')]
 
-        file = asksaveasfile(filetypes=files, defaultextension=files)
-        self.designer.highway.save_highway(file.name)
+            file = asksaveasfile(filetypes=files, defaultextension=files)
+            self.designer.highway.save_highway(file.name)
+        except:
+            messagebox.showerror(title='Road Designer', message='Error saving highway to file!')
+
 
     def handle_mouse_press(self, button):
         pass
