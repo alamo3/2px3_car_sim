@@ -5,6 +5,9 @@ import pygame
 from geometry.Point import Point
 from geometry.utils import Utils
 
+from car.car import Car
+from car.sdcar import SDCar
+
 
 class Lane:
 
@@ -14,6 +17,7 @@ class Lane:
         self.origin_point: Point = None
         self.lane_txt = pygame.font.Font(None, 15).render("Lane " + str(self.lane_num), True, (0, 0, 0))
         self.temp_segment = None
+        self.cars = []
 
     def set_origin(self, point: Point):
         self.origin_point = point
@@ -124,3 +128,10 @@ class Lane:
                 self.complete_temp_segment_curve(Point.list2point(segment_info[5:7]),
                                                  Point.list2point(segment_info[3:5]))
 
+    def add_car(self, car: Car):
+        self.cars.append(car)
+
+    def calculate_length(self):
+        calculated_distance = 0
+        for segment in self.segments:
+            calculated_distance = calculated_distance + segment.calculate_length()

@@ -7,6 +7,9 @@ from road.ramp import Ramp
 from geometry.Point import Point
 from geometry.utils import Utils
 
+from car.car import Car
+from car.sdcar import SDCar
+
 
 class Highway:
 
@@ -228,3 +231,6 @@ class Highway:
             self.entry_ramps.append(new_ramp)
 
         file.close()
+
+    def add_car_to_lane(self, lane_num, car: Car):
+        pass

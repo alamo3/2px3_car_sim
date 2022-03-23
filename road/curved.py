@@ -3,6 +3,7 @@ from road.road import Road
 from road.type import Type
 import pygame
 from geometry.Point import Point
+from geometry.utils import Utils
 
 BEZIER_RESOLUTION = 50
 
@@ -52,6 +53,13 @@ class CurvedRoad(Road):
 
         for line in self.segments:
             pygame.draw.line(surface, (0, 255, 0), (line.x, line.y), (line.x1, line.y1))
+
+    def calculate_length(self):
+        calculated_length = 0
+        for line in self.segments:
+            calculated_length = calculated_length + Utils.dist_points(Point(line.x, line.y), Point(line.x1, line.y1))
+
+        return calculated_length * globalprops.KM_PER_UNIT
 
     def export(self):
         return "CURVED,"+self.start_p.toString()+","+self.control_point.toString()+","+self.end_p.toString()

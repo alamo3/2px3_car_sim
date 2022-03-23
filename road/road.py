@@ -20,3 +20,15 @@ class Road(ABC):
     @abstractmethod
     def draw(self, surface):
         pass
+
+    @abstractmethod
+    def calculate_length(self):
+        pass
+
+    @abstractmethod
+    def calculate_parameter_distance(self, distance):
+        pass
+
+    @abstractmethod
+    def calculate_point(self, t):
+        pass

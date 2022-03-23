@@ -58,3 +58,7 @@ class Utils:
     def translate_point_for_lane(point: Point, lane_num, lane_width):
         lane_origin_x = point.x + (lane_width * lane_num)
         return Point(lane_origin_x, point.y)
+
+    @staticmethod
+    def dist_points(p0: Point, p1: Point):
+        return math.sqrt((p1.x - p0.x)**2 + (p1.y - p0.y)**2)
