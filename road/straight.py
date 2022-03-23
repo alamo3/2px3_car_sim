@@ -1,9 +1,10 @@
+import math
+
 import globalprops
 from road.road import Road
 from road.type import Type
 import pygame
 from geometry.Point import Point
-from geometry.utils import Utils
 
 
 class StraightRoad(Road):
@@ -26,7 +27,7 @@ class StraightRoad(Road):
             pygame.draw.line(surface, (0, 0, 255), self.start_p.get_tuple(), self.end_p.get_tuple())
 
     def calculate_length(self):
-        return Utils.dist_points(self.start_p, self.end_p) * globalprops.KM_PER_UNIT
+        return math.sqrt((self.end_p.x - self.start_p.x)**2 + (self.end_p.y - self.start_p.y)**2) * globalprops.KM_PER_UNIT
 
     def calculate_parameter_distance(self, distance):
         return distance / self.calculate_length()

@@ -11,11 +11,12 @@ class Car:
         self.risk_factor = risk_factor
         self.following_distance = following_distance
         self.lane_num = lane_num
-        self.speed = 0
+        self.speed = 70
         self.pos: Point = self.get_starting_pos()
+        self.segment_num = 0
         self.current_segment: Road = self.get_segment()
         self.distance_on_segment = 0
-        self.segment_num = 0
+        self.reached_end = False
 
     def get_starting_pos(self):
         lane = self.get_lane()
@@ -50,10 +51,14 @@ class Car:
 
         if self.distance_on_segment > self.current_segment.calculate_length():
             remaining_distance = self.distance_on_segment - self.current_segment.calculate_length()
+
+            if self.segment_num == (len(self.get_lane().segments)-1):
+                self.reached_end = True
+                return
+
             self.get_next_segment()
             self.distance_on_segment = remaining_distance
             self.pos = self.current_segment.calculate_point_distance(self.distance_on_segment)
-
         else:
             self.pos = self.current_segment.calculate_point_distance(self.distance_on_segment)
 

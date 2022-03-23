@@ -5,7 +5,6 @@ from road.road import Road
 from road.type import Type
 import pygame
 from geometry.Point import Point
-from geometry.utils import Utils
 from typing import List
 
 BEZIER_RESOLUTION = 50
@@ -20,7 +19,7 @@ class Line:
         self.dir_vector = Point(x1 - x, y1 - y)
 
     def get_length(self):
-        return math.sqrt((self.x1 - self.x)**2 + (self.y1 - self.y)) * globalprops.KM_PER_UNIT
+        return math.sqrt((self.x1 - self.x)**2 + (self.y1 - self.y)**2) * globalprops.KM_PER_UNIT
 
     def get_point_for_distance(self, distance):
         distance_sim = distance / globalprops.KM_PER_UNIT

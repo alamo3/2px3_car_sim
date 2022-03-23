@@ -234,3 +234,6 @@ class Highway:
 
     def add_car_to_lane(self, lane_num, car: Car):
         self.lanes[lane_num].add_car(car)
+
+    def remove_car_from_lane(self, car):
+        self.lanes[car.lane_num].cars.remove(car)

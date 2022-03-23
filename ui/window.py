@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 
@@ -24,6 +26,7 @@ class Window:
         self.button_click_callback = None
         self.quit_callback = None
         self.update_callback = None
+        self.prev_time = time.time()
 
         pygame.display.set_caption(window_title)
 
@@ -78,9 +81,10 @@ class Window:
     def run(self):
 
         while True:
-
+            curr_time = time.time()
             if self.update_callback:
-                self.update_callback()
+                self.update_callback(curr_time - self.prev_time)
+                self.prev_time = curr_time
 
             for event in pygame.event.get():  # pass on events to the active state
                 if self.event_handling_callback:
