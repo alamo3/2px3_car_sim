@@ -23,6 +23,7 @@ class Window:
         self.event_handling_callback = None
         self.button_click_callback = None
         self.quit_callback = None
+        self.update_callback = None
 
         pygame.display.set_caption(window_title)
 
@@ -46,6 +47,9 @@ class Window:
 
     def set_quit_callback(self, function):
         self.quit_callback = function
+
+    def set_update_callback(self, function):
+        self.update_callback = function
 
     def draw_buttons(self):
 
@@ -74,6 +78,10 @@ class Window:
     def run(self):
 
         while True:
+
+            if self.update_callback:
+                self.update_callback()
+
             for event in pygame.event.get():  # pass on events to the active state
                 if self.event_handling_callback:
                     self.event_handling_callback(event)

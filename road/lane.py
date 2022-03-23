@@ -1,3 +1,5 @@
+from enum import Enum
+
 from road.straight import StraightRoad
 from road.curved import CurvedRoad
 from road.type import Type
@@ -8,6 +10,9 @@ from geometry.utils import Utils
 from car.car import Car
 from car.sdcar import SDCar
 
+class LaneType(Enum):
+    AUTONOMOUS_LANE = 0,
+    NORMAL_LANE = 1
 
 class Lane:
 
@@ -18,6 +23,8 @@ class Lane:
         self.lane_txt = pygame.font.Font(None, 15).render("Lane " + str(self.lane_num), True, (0, 0, 0))
         self.temp_segment = None
         self.cars = []
+        self.speed_limit = 0
+        self.lane_type = LaneType.NORMAL_LANE
 
     def set_origin(self, point: Point):
         self.origin_point = point
@@ -102,6 +109,9 @@ class Lane:
         if self.temp_segment is not None:
             self.temp_segment.draw(surface)
 
+        for car in self.cars:
+            car.draw(surface)
+
     def export(self):
         lane_dict = {"segment_num": len(self.segments), "origin_point": self.origin_point.toString()}
         segments_dict = {}
@@ -130,6 +140,12 @@ class Lane:
 
     def add_car(self, car: Car):
         self.cars.append(car)
+
+    def set_speed_limit(self, speed_limit):
+        self.speed_limit = speed_limit
+
+    def set_lane_type(self, lane_type: LaneType):
+        self.lane_type = lane_type
 
     def calculate_length(self):
         calculated_distance = 0

@@ -1,9 +1,12 @@
+import math
+
 import globalprops
 from road.road import Road
 from road.type import Type
 import pygame
 from geometry.Point import Point
 from geometry.utils import Utils
+from typing import List
 
 BEZIER_RESOLUTION = 50
 
@@ -14,6 +17,15 @@ class Line:
         self.y = y
         self.x1 = x1
         self.y1 = y1
+        self.dir_vector = Point(x1 - x, y1 - y)
+
+    def get_length(self):
+        return math.sqrt((self.x1 - self.x)**2 + (self.y1 - self.y)) * globalprops.KM_PER_UNIT
+
+    def get_point_for_distance(self, distance):
+        distance_sim = distance / globalprops.KM_PER_UNIT
+        t = distance_sim / self.get_length()
+        return Point(self.x + self.dir_vector.x * t, self.y + self.dir_vector.y * t)
 
 
 class CurvedRoad(Road):
@@ -21,7 +33,7 @@ class CurvedRoad(Road):
     def __init__(self, begin_point: Point, control_point: Point, end_point: Point):
         Road.__init__(self, begin_point, end_point, Type.curved)
         self.control_point = control_point
-        self.segments = []
+        self.segments: List[Line] = []
 
         self.calculate_curve()
 
@@ -57,9 +69,22 @@ class CurvedRoad(Road):
     def calculate_length(self):
         calculated_length = 0
         for line in self.segments:
-            calculated_length = calculated_length + Utils.dist_points(Point(line.x, line.y), Point(line.x1, line.y1))
+            calculated_length = calculated_length + line.get_length()
 
-        return calculated_length * globalprops.KM_PER_UNIT
+        return calculated_length
+
+    def calculate_parameter_distance(self, distance):
+        pass
+
+    def calculate_point_distance(self, distance):
+        distance_accum = 0
+
+        for segment in self.segments:
+            distance_accum = distance_accum + segment.get_length()
+            if distance_accum >= distance:
+                remain_distance = distance_accum - distance
+                return segment.get_point_for_distance(remain_distance)
+
 
     def export(self):
         return "CURVED,"+self.start_p.toString()+","+self.control_point.toString()+","+self.end_p.toString()

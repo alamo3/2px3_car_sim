@@ -32,3 +32,8 @@ class Road(ABC):
     @abstractmethod
     def calculate_point(self, t):
         pass
+
+    @abstractmethod
+    def calculate_point_distance(self, distance):
+        pass
+

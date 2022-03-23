@@ -34,5 +34,8 @@ class StraightRoad(Road):
     def calculate_point(self, t):
         return Point(self.start_p.x + self.dir_vector[0] * t, self.start_p.y + self.dir_vector[1] * t)
 
+    def calculate_point_distance(self, distance):
+        return self.calculate_point(self.calculate_parameter_distance(distance))
+
     def export(self):
         return "STRAIGHT," + self.start_p.toString() + "," + self.end_p.toString()

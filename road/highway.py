@@ -233,4 +233,4 @@ class Highway:
         file.close()
 
     def add_car_to_lane(self, lane_num, car: Car):
-        pass
+        self.lanes[lane_num].add_car(car)

@@ -33,6 +33,7 @@ class Simulation:
                                       ButtonIdent.load_highway))
         self.window.set_rendering_callback(self.draw)
         self.window.set_button_click_callback(self.handle_button_press)
+        self.window.update_callback(self.update)
 
     def draw_highway(self, draw_surface):
         if self.highway is not None:
@@ -57,6 +58,9 @@ class Simulation:
 
     def run(self):
         self.window.run()
+
+    def update(self):
+        pass
 
     def draw(self, draw_surface):
         self.draw_highway(draw_surface)
