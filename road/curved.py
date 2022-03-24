@@ -8,7 +8,7 @@ from geometry.Point import Point
 from typing import List
 from geometry.line import Line
 
-BEZIER_RESOLUTION = 50
+BEZIER_RESOLUTION = 100
 
 
 class CurvedRoad(Road):

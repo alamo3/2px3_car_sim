@@ -31,13 +31,22 @@ class Car:
 
     def perform_lane_change(self, new_lane_num):
         new_lane = highway_interface.get_lane_by_id(new_lane_num)
+        prev_lane = self.get_lane()
         new_segment_pos = new_lane.get_position_on_lane(self.get_segment(), self.pos)
+
+        if new_segment_pos[0] is None:
+            return  # abort lane change, not possible
+
         self.pos = new_segment_pos[0]
         self.lane_num = new_lane_num
         self.segment_num = new_segment_pos[1]
         self.distance_on_segment = new_segment_pos[2]
         self.current_segment = self.get_segment()
         self.debug_changed_lane = True
+        prev_lane.cars.remove(self)
+        new_lane.cars.append(self)
+
+
 
     def adjust_following_distance(self):
         pass

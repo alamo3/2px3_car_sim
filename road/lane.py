@@ -187,4 +187,7 @@ class Lane:
                 closest_distance = dist
                 closest_segment = lane_segment
 
+        if closest_segment is None:
+            return None, -1, -1
+
         return closest_point, self.segments.index(closest_segment), closest_segment.get_distance_to_point(closest_point)
