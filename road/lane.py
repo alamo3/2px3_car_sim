@@ -1,3 +1,4 @@
+import math
 from enum import Enum
 
 from road.straight import StraightRoad
@@ -10,9 +11,11 @@ from geometry.utils import Utils
 from car.car import Car
 from car.sdcar import SDCar
 
+
 class LaneType(Enum):
     AUTONOMOUS_LANE = 0,
     NORMAL_LANE = 1
+
 
 class Lane:
 
@@ -151,3 +154,37 @@ class Lane:
         calculated_distance = 0
         for segment in self.segments:
             calculated_distance = calculated_distance + segment.calculate_length()
+
+    def get_pos_segment_distance(self, distance):
+        calculated_distance = 0
+
+        for segment in self.segments:
+            calculated_distance = calculated_distance + segment.calculate_length()
+            if calculated_distance >= distance:
+                remain_distance = calculated_distance - distance
+
+                if self.segments.index(segment) == 0:
+                    remain_distance = distance
+
+                return segment.calculate_point_distance(remain_distance), self.segments.index(segment), remain_distance
+
+    def get_position_on_lane(self, segment, current_pos):
+
+        closest_distance = 1000000
+        closest_point = None
+        closest_segment = None
+
+        for lane_segment in self.segments:
+            intx_point = lane_segment.calculate_intersection_perp(segment, current_pos)
+
+            if intx_point is None:
+                continue
+
+            dist = intx_point.distance_to(current_pos)
+
+            if dist < closest_distance:
+                closest_point = intx_point
+                closest_distance = dist
+                closest_segment = lane_segment
+
+        return closest_point, self.segments.index(closest_segment), closest_segment.get_distance_to_point(closest_point)

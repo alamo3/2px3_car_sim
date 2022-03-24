@@ -27,6 +27,7 @@ class Window:
         self.quit_callback = None
         self.update_callback = None
         self.prev_time = time.time()
+        self.background_color = (255,255,255)
 
         pygame.display.set_caption(window_title)
 
@@ -65,6 +66,9 @@ class Window:
         txt_surface = pygame.font.Font(None, 25).render(self.title, True, (0, 0, 0))
         self.draw_surface.blit(txt_surface, (640, 10))
 
+    def set_background_color(self, color):
+        self.background_color = color
+
     def quit(self):
         if self.quit_callback:
             self.quit_callback()
@@ -72,7 +76,7 @@ class Window:
         exit(0)
 
     def draw(self):
-        self.draw_surface.fill((255, 255, 255))
+        self.draw_surface.fill(self.background_color)
         self.draw_title()
         self.draw_buttons()
 

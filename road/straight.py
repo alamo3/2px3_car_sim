@@ -5,6 +5,7 @@ from road.road import Road
 from road.type import Type
 import pygame
 from geometry.Point import Point
+from geometry.line import Line
 
 
 class StraightRoad(Road):
@@ -37,6 +38,28 @@ class StraightRoad(Road):
 
     def calculate_point_distance(self, distance):
         return self.calculate_point(self.calculate_parameter_distance(distance))
+
+    def calculate_tangent(self, pos: Point):
+        line = Line(self.start_p.x, self.start_p.y, self.end_p.x, self.end_p.y)
+        return line.get_perpendicular_point(pos)
+
+    def get_dir_vector(self, pos: Point):
+        line = Line(pos.x, pos.y, self.end_p.x, self.end_p.y)
+        return line
+
+    def calculate_intersection_perp(self, segment: Road, pos: Point):
+        perp_direction = segment.calculate_tangent(pos)
+        parallel_direction = Line(self.start_p.x, self.start_p.y, self.end_p.x, self.end_p.y)
+
+        intx = perp_direction.get_intersection(parallel_direction)
+        param_intx = parallel_direction.get_param_for_point(intx)
+
+        if 0.0 <= param_intx <= 1.0:
+            return intx
+
+
+    def get_distance_to_point(self, pos):
+        return self.start_p.distance_to(pos) * globalprops.KM_PER_UNIT
 
     def export(self):
         return "STRAIGHT," + self.start_p.toString() + "," + self.end_p.toString()

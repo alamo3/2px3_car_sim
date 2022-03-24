@@ -1,3 +1,5 @@
+import math
+
 class Point:
 
     def __init__(self, x, y):
@@ -6,6 +8,9 @@ class Point:
 
     def get_tuple(self):
         return self.x, self.y
+
+    def distance_to(self, point):
+        return math.sqrt((self.x - point.x) ** 2 + (self.y - point.y) ** 2)
 
     def toString(self):
         return str(self.x) + "," + str(self.y)

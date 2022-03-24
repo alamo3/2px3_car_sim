@@ -6,25 +6,9 @@ from road.type import Type
 import pygame
 from geometry.Point import Point
 from typing import List
+from geometry.line import Line
 
 BEZIER_RESOLUTION = 50
-
-
-class Line:
-    def __init__(self, x, y, x1, y1):
-        self.x = x
-        self.y = y
-        self.x1 = x1
-        self.y1 = y1
-        self.dir_vector = Point(x1 - x, y1 - y)
-
-    def get_length(self):
-        return math.sqrt((self.x1 - self.x)**2 + (self.y1 - self.y)**2) * globalprops.KM_PER_UNIT
-
-    def get_point_for_distance(self, distance):
-        distance_sim = distance / globalprops.KM_PER_UNIT
-        t = distance_sim / self.get_length()
-        return Point(self.x + self.dir_vector.x * t, self.y + self.dir_vector.y * t)
 
 
 class CurvedRoad(Road):
@@ -84,6 +68,52 @@ class CurvedRoad(Road):
                 remain_distance = distance_accum - distance
                 return segment.get_point_for_distance(remain_distance)
 
+    def calculate_tangent(self, pos: Point):
+        segment = self.find_segment_for_point(pos)
+        return segment.get_perpendicular_point(pos)
+
+    def find_segment_for_point(self, pos: Point):
+        for segment in self.segments:
+            if segment.is_point_on_line(pos):
+                return segment
+
+        return None
+
+    def get_dir_vector(self, pos: Point):
+        segment = self.find_segment_for_point(pos)
+        return Line(pos.x, pos.y, segment.x1, segment.y1)
+
+    def calculate_intersection_perp(self, segment: Road, pos: Point):
+        closest_dist = 1000000
+        closest_intx = None
+        perp_direction = segment.calculate_tangent(pos)
+
+        for segment in self.segments:
+            intx = segment.get_intersection(perp_direction)
+            param_intx = segment.get_param_for_point(intx)
+
+            if not 0.0 <= param_intx <= 1.0:
+                continue
+
+            dist_intx = intx.distance_to(pos)
+
+            if dist_intx < closest_dist:
+                closest_intx = intx
+                closest_dist = dist_intx
+
+        return closest_intx
+
+    def get_distance_to_point(self, pos):
+        accum_distance = 0
+
+        for segment in self.segments:
+            if segment.is_point_on_line(pos):
+                accum_distance = accum_distance + Point(segment.x, segment.y).distance_to(pos) * globalprops.KM_PER_UNIT
+                break
+
+            accum_distance = accum_distance + segment.get_length()
+
+        return accum_distance
 
     def export(self):
-        return "CURVED,"+self.start_p.toString()+","+self.control_point.toString()+","+self.end_p.toString()
+        return "CURVED," + self.start_p.toString() + "," + self.control_point.toString() + "," + self.end_p.toString()

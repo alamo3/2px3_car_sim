@@ -4,6 +4,7 @@ from geometry.Point import Point
 from road.road import Road
 import pygame
 
+
 class Car:
 
     def __init__(self, reaction_time, risk_factor, following_distance, lane_num):
@@ -17,6 +18,8 @@ class Car:
         self.current_segment: Road = self.get_segment()
         self.distance_on_segment = 0
         self.reached_end = False
+        self.distance_total = 0
+        self.debug_changed_lane = False
 
     def get_starting_pos(self):
         lane = self.get_lane()
@@ -26,8 +29,15 @@ class Car:
         lane = self.get_lane()
         return lane.segments[self.segment_num]
 
-    def perform_lane_change(self):
-        pass
+    def perform_lane_change(self, new_lane_num):
+        new_lane = highway_interface.get_lane_by_id(new_lane_num)
+        new_segment_pos = new_lane.get_position_on_lane(self.get_segment(), self.pos)
+        self.pos = new_segment_pos[0]
+        self.lane_num = new_lane_num
+        self.segment_num = new_segment_pos[1]
+        self.distance_on_segment = new_segment_pos[2]
+        self.current_segment = self.get_segment()
+        self.debug_changed_lane = True
 
     def adjust_following_distance(self):
         pass
@@ -46,13 +56,19 @@ class Car:
         return highway_interface.get_lane_by_id(self.lane_num)
 
     def move_forward_in_lane(self, delta_time):
+
+        if self.debug_changed_lane:
+            print("Break")
+            self.debug_changed_lane = False
+
         distance_travelled = delta_time * self.speed
         self.distance_on_segment = self.distance_on_segment + distance_travelled
+        self.distance_total = self.distance_total + distance_travelled
 
         if self.distance_on_segment > self.current_segment.calculate_length():
             remaining_distance = self.distance_on_segment - self.current_segment.calculate_length()
 
-            if self.segment_num == (len(self.get_lane().segments)-1):
+            if self.segment_num == (len(self.get_lane().segments) - 1):
                 self.reached_end = True
                 return
 
@@ -64,7 +80,3 @@ class Car:
 
     def draw(self, draw_surface):
         pygame.draw.circle(draw_surface, (206, 0, 252), self.pos.get_tuple(), 10)
-
-
-
-

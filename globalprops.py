@@ -2,4 +2,4 @@
 
 EDITING_MODE = False
 
-KM_PER_UNIT = 1.0
+KM_PER_UNIT = 5.0
