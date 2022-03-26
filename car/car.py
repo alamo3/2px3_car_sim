@@ -12,7 +12,7 @@ class Car:
         self.risk_factor = risk_factor
         self.following_distance = following_distance
         self.lane_num = lane_num
-        self.speed = 70
+        self.speed = 100
         self.pos: Point = self.get_starting_pos()
         self.segment_num = 0
         self.current_segment: Road = self.get_segment()
@@ -70,7 +70,7 @@ class Car:
             print("Break")
             self.debug_changed_lane = False
 
-        distance_travelled = delta_time * self.speed
+        distance_travelled = (delta_time/3600) * self.speed
         self.distance_on_segment = self.distance_on_segment + distance_travelled
         self.distance_total = self.distance_total + distance_travelled
 

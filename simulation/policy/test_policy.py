@@ -41,10 +41,11 @@ class TestPolicy(DrivingPolicy):
             self.generate_car(random.randint(0, 2))
 
         for car in cm.cars:
-            car.move_forward_in_lane(dt)
-            if self.timer > 5.0:
+            if self.timer > 0.5:
                 car.perform_lane_change(self.choose_new_lane(car.lane_num))
                 self.timer = 0.0
+            car.move_forward_in_lane(dt)
+
 
 
 

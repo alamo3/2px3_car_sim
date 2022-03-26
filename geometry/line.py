@@ -32,7 +32,7 @@ class Line:
             return param_neg
 
     def get_point(self, t):
-        return Point(self.x + t* self.dir_vector.x, self.y + t* self.dir_vector.y)
+        return Point(self.x + t * self.dir_vector.x, self.y + t * self.dir_vector.y)
 
     def get_perpendicular_point(self, point: Point):
         new_dir_vector = Point(self.dir_vector.y, -self.dir_vector.x)
@@ -61,9 +61,8 @@ class Line:
 
         dist_ab = self.get_length() / globalprops.KM_PER_UNIT
 
-        return ((dist_ap + dist_pb) - dist_ab) < 0.002
+        return ((dist_ap + dist_pb) - dist_ab) < 0.0000000005
 
     def get_point_for_distance(self, distance):
-        distance_sim = distance / globalprops.KM_PER_UNIT
-        t = distance_sim / self.get_length()
+        t = distance / self.get_length()
         return Point(self.x + self.dir_vector.x * t, self.y + self.dir_vector.y * t)

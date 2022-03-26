@@ -77,14 +77,12 @@ class CurvedRoad(Road):
             if segment.is_point_on_line(pos):
                 return segment
 
-        return None
-
     def get_dir_vector(self, pos: Point):
         segment = self.find_segment_for_point(pos)
         return Line(pos.x, pos.y, segment.x1, segment.y1)
 
     def calculate_intersection_perp(self, segment: Road, pos: Point):
-        closest_dist = 1000000
+        closest_dist = 1000000.0
         closest_intx = None
         perp_direction = segment.calculate_tangent(pos)
 
