@@ -1,9 +1,20 @@
+import math
+from enum import Enum
+
 from road.straight import StraightRoad
 from road.curved import CurvedRoad
 from road.type import Type
 import pygame
 from geometry.Point import Point
 from geometry.utils import Utils
+
+from car.car import Car
+from car.sdcar import SDCar
+
+
+class LaneType(Enum):
+    AUTONOMOUS_LANE = 0,
+    NORMAL_LANE = 1
 
 
 class Lane:
@@ -14,6 +25,9 @@ class Lane:
         self.origin_point: Point = None
         self.lane_txt = pygame.font.Font(None, 15).render("Lane " + str(self.lane_num), True, (0, 0, 0))
         self.temp_segment = None
+        self.cars = []
+        self.speed_limit = 0
+        self.lane_type = LaneType.NORMAL_LANE
 
     def set_origin(self, point: Point):
         self.origin_point = point
@@ -98,6 +112,9 @@ class Lane:
         if self.temp_segment is not None:
             self.temp_segment.draw(surface)
 
+        for car in self.cars:
+            car.draw(surface)
+
     def export(self):
         lane_dict = {"segment_num": len(self.segments), "origin_point": self.origin_point.toString()}
         segments_dict = {}
@@ -124,3 +141,53 @@ class Lane:
                 self.complete_temp_segment_curve(Point.list2point(segment_info[5:7]),
                                                  Point.list2point(segment_info[3:5]))
 
+    def add_car(self, car: Car):
+        self.cars.append(car)
+
+    def set_speed_limit(self, speed_limit):
+        self.speed_limit = speed_limit
+
+    def set_lane_type(self, lane_type: LaneType):
+        self.lane_type = lane_type
+
+    def calculate_length(self):
+        calculated_distance = 0
+        for segment in self.segments:
+            calculated_distance = calculated_distance + segment.calculate_length()
+
+    def get_pos_segment_distance(self, distance):
+        calculated_distance = 0
+
+        for segment in self.segments:
+            calculated_distance = calculated_distance + segment.calculate_length()
+            if calculated_distance >= distance:
+                remain_distance = calculated_distance - distance
+
+                if self.segments.index(segment) == 0:
+                    remain_distance = distance
+
+                return segment.calculate_point_distance(remain_distance), self.segments.index(segment), remain_distance
+
+    def get_position_on_lane(self, segment, current_pos):
+
+        closest_distance = 1000000
+        closest_point = None
+        closest_segment = None
+
+        for lane_segment in self.segments:
+            intx_point = lane_segment.calculate_intersection_perp(segment, current_pos)
+
+            if intx_point is None:
+                continue
+
+            dist = intx_point.distance_to(current_pos)
+
+            if dist < closest_distance:
+                closest_point = intx_point
+                closest_distance = dist
+                closest_segment = lane_segment
+
+        if closest_segment is None:
+            return None, -1, -1
+
+        return closest_point, self.segments.index(closest_segment), closest_segment.get_distance_to_point(closest_point)

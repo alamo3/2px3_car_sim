@@ -20,3 +20,36 @@ class Road(ABC):
     @abstractmethod
     def draw(self, surface):
         pass
+
+    @abstractmethod
+    def calculate_length(self):
+        pass
+
+    @abstractmethod
+    def calculate_parameter_distance(self, distance):
+        pass
+
+    @abstractmethod
+    def calculate_point(self, t):
+        pass
+
+    @abstractmethod
+    def calculate_point_distance(self, distance):
+        pass
+
+    @abstractmethod
+    def calculate_tangent(self, pos: Point):
+        pass
+
+    @abstractmethod
+    def get_dir_vector(self, pos: Point):
+        pass
+
+    @abstractmethod
+    def calculate_intersection_perp(self, segment, pos: Point):
+        pass
+
+    @abstractmethod
+    def get_distance_to_point(self, pos):
+        pass
+

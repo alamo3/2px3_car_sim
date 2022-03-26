@@ -25,7 +25,7 @@ class DesignerState(ABC):
     def set_button_visibility(self):
         start_y = 10
         button_drawn = 0
-        for button in self.designer.buttons:
+        for button in self.designer.window.buttons:
             if button.ident in self.show_buttons:
                 button.is_visible = True
                 button.update_coords(button.x, start_y + (button_drawn * 30))
