@@ -7,7 +7,7 @@ import pygame
 
 class Car:
 
-    def __init__(self, reaction_time, risk_factor, following_distance, lane_num):
+    def __init__(self, reaction_time, risk_factor, following_distance, lane_num, car_id=0):
         self.reaction_time = reaction_time
         self.risk_factor = risk_factor
         self.following_distance = following_distance
@@ -20,6 +20,7 @@ class Car:
         self.reached_end = False
         self.distance_total = 0
         self.debug_changed_lane = False
+        self.car_id = car_id
 
     def get_starting_pos(self):
         lane = self.get_lane()
@@ -46,8 +47,6 @@ class Car:
         prev_lane.cars.remove(self)
         new_lane.cars.append(self)
 
-
-
     def adjust_following_distance(self):
         pass
 
@@ -64,13 +63,16 @@ class Car:
     def get_lane(self):
         return highway_interface.get_lane_by_id(self.lane_num)
 
-    def move_forward_in_lane(self, delta_time):
+    def move_forward_in_lane(self, delta_time, lead_car=None):
+
+        if lead_car is not None:
+            print("Lead car for "+str(self.car_id)+" is "+str(lead_car.car_id))
 
         if self.debug_changed_lane:
             print("Break")
             self.debug_changed_lane = False
 
-        distance_travelled = (delta_time/3600) * self.speed
+        distance_travelled = (delta_time / 3600) * self.speed
         self.distance_on_segment = self.distance_on_segment + distance_travelled
         self.distance_total = self.distance_total + distance_travelled
 
@@ -89,3 +91,5 @@ class Car:
 
     def draw(self, draw_surface):
         pygame.draw.circle(draw_surface, (206, 0, 252), self.pos.get_tuple(), 10)
+        txt_surface = pygame.font.Font(None, 15).render(str(self.car_id), True, (0, 0, 0))
+        draw_surface.blit(txt_surface, (self.pos.x, self.pos.y))

@@ -3,6 +3,7 @@ from enum import Enum
 
 from road.straight import StraightRoad
 from road.curved import CurvedRoad
+from road.road import Road
 from road.type import Type
 import pygame
 from geometry.Point import Point
@@ -10,6 +11,7 @@ from geometry.utils import Utils
 
 from car.car import Car
 from car.sdcar import SDCar
+from typing import List
 
 
 class LaneType(Enum):
@@ -20,7 +22,7 @@ class LaneType(Enum):
 class Lane:
 
     def __init__(self, lane_num):
-        self.segments = []
+        self.segments: List[Road] = []
         self.lane_num = lane_num
         self.origin_point: Point = None
         self.lane_txt = pygame.font.Font(None, 15).render("Lane " + str(self.lane_num), True, (0, 0, 0))
