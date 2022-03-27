@@ -10,12 +10,14 @@ class Line:
         self.x1 = x1
         self.y1 = y1
         self.dir_vector = Point(x1 - x, y1 - y)
+        self.length_units = math.sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2)
+        self.length = self.length_units * globalprops.KM_PER_UNIT
 
     def get_length(self):
-        return math.sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2) * globalprops.KM_PER_UNIT
+        return self.length
 
     def get_length_units(self):
-        return math.sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2)
+        return self.length_units
 
     def get_perpendicular(self):
         return self.get_perpendicular_point(Point(self.x, self.y))

@@ -20,6 +20,7 @@ class CurvedRoad(Road):
         self.curvatures: List[float] = []
 
         self.calculate_curve()
+        self.calculate_length()
 
     def calculate_point(self, t):
         x = (1 - t) * (1 - t) * self.start_p.x + 2 * (1 - t) * t * self.control_point.x + t * t * self.end_p.x
@@ -85,7 +86,10 @@ class CurvedRoad(Road):
         for line in self.segments:
             calculated_length = calculated_length + line.get_length()
 
-        return calculated_length
+        self.length = calculated_length
+
+    def get_length(self):
+        return self.length
 
     def calculate_parameter_distance(self, distance):
         pass

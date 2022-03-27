@@ -16,7 +16,7 @@ def get_num_cars_lane(lane_id):
 
 
 def get_lane_length(lane_id):
-    return highway.lanes[lane_id].calculate_length()
+    return highway.lanes[lane_id].get_length()
 
 
 def lane_has_ramp(lane_id):

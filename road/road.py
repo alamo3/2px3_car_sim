@@ -9,6 +9,7 @@ class Road(ABC):
         self.start_p = start_p
         self.end_p = end_p
         self.road_type = type
+        self.length = 0
 
     def points(self):
         return [self.start_p, self.end_p]
@@ -22,7 +23,7 @@ class Road(ABC):
         pass
 
     @abstractmethod
-    def calculate_length(self):
+    def get_length(self):
         pass
 
     @abstractmethod

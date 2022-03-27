@@ -9,10 +9,8 @@ from car.car_controller import VehicleController
 
 class Car:
 
-    def __init__(self, reaction_time, risk_factor, following_distance, lane_num, car_id=0):
-        self.reaction_time = reaction_time
+    def __init__(self, risk_factor, lane_num, car_id=0):
         self.risk_factor = risk_factor
-        self.following_distance = following_distance
         self.lane_num = lane_num
         self.speed = 100
         self.pos: Point = self.get_starting_pos()
@@ -27,9 +25,10 @@ class Car:
         self.slowing_curve = False
         self.controller: VehicleController = None
 
-    def init_controller(self, min_following_distance, accel_smoothing, reaction_time,max_accel, comf_decel, max_speed):
+    def init_controller(self, min_following_distance, accel_smoothing, reaction_time, max_accel, comf_decel, max_speed):
+        max_speed = max_speed / 3.6
         self.controller = VehicleController(min_following_distance, accel_smoothing, reaction_time, max_accel,
-                                            comf_decel, max_speed, self.speed)
+                                            comf_decel, max_speed, self.speed / 3.6)
 
     def get_starting_pos(self):
         lane = self.get_lane()
@@ -72,28 +71,41 @@ class Car:
     def get_lane(self):
         return highway_interface.get_lane_by_id(self.lane_num)
 
+    def calculate_curve_slowdown(self):
+        if self.current_segment.road_type == Type.curved:
+            speed_adjustment = (1 - self.current_segment.get_curvature_factor(self.pos)) * 20
+            if speed_adjustment < 0:
+                speed_adjustment = 0
+            self.slowing_curve = False if speed_adjustment < 2 else True
+            return speed_adjustment
+        else:
+            self.slowing_curve = False
+            return 0
+
     def move_forward_in_lane(self, delta_time, lead_car=None, lead_distance=0):
 
         self.lead_car = lead_car
 
         if self.debug_changed_lane:
-            #print("Break")
+            # print("Break")
             self.debug_changed_lane = False
 
-        speed_adjustment = 0
+        speed_adj = self.calculate_curve_slowdown()
+        self.controller.max_speed = (self.get_lane().speed_limit - speed_adj) / 3.6
+        self.controller.update_motion(delta_time, lead_car, lead_distance)
+        accel = self.controller.current_accel
+        self.speed = self.controller.get_speed()
 
-        if self.current_segment.road_type == Type.curved:
-            speed_adjustment = (1 - self.current_segment.get_curvature_factor(self.pos)) * 25
-            self.slowing_curve = False if speed_adjustment < 2 else True
-        else:
-            self.slowing_curve = False
+        time_second = delta_time
+        speed_ms = self.speed / 3.6
 
-        distance_travelled = (delta_time / 3600) * (self.speed - speed_adjustment)
-        self.distance_on_segment = self.distance_on_segment + distance_travelled
-        self.distance_total = self.distance_total + distance_travelled
+        distance_travelled = (time_second * speed_ms) + (0.5 * accel * delta_time * delta_time)
+        distance_travelled_km = distance_travelled / 1000.0
+        self.distance_on_segment = self.distance_on_segment + distance_travelled_km
+        self.distance_total = self.distance_total + distance_travelled_km
 
-        if self.distance_on_segment > self.current_segment.calculate_length():
-            remaining_distance = self.distance_on_segment - self.current_segment.calculate_length()
+        if self.distance_on_segment > self.current_segment.get_length():
+            remaining_distance = self.distance_on_segment - self.current_segment.get_length()
 
             if self.segment_num == (len(self.get_lane().segments) - 1):
                 self.reached_end = True
@@ -113,6 +125,7 @@ class Car:
 
         pygame.draw.circle(draw_surface, draw_color, self.pos.get_tuple(), 10)
 
-        txt = str(self.car_id)+"/"+str(self.lead_car.car_id) if self.lead_car is not None else str(self.car_id)
+        txt = str(self.car_id) + "/" + str(self.lead_car.car_id) if self.lead_car is not None else str(self.car_id)
+        txt = txt + "/" + str(round(self.speed))
         txt_surface = pygame.font.Font(None, 15).render(txt, True, (0, 0, 0))
         draw_surface.blit(txt_surface, (self.pos.x, self.pos.y))

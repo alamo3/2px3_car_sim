@@ -17,6 +17,7 @@ class StraightRoad(Road):
 
         if p2 is not None:
             self.dir_vector = (p2.x - p1.x, p2.y - p1.y)
+            self.length = math.sqrt((self.end_p.x - self.start_p.x)**2 + (self.end_p.y - self.start_p.y)**2) * globalprops.KM_PER_UNIT
 
     def draw(self, surface):
 
@@ -27,11 +28,11 @@ class StraightRoad(Road):
         if (self.start_p is not None) and (self.end_p is not None):
             pygame.draw.line(surface, (0, 0, 255), self.start_p.get_tuple(), self.end_p.get_tuple())
 
-    def calculate_length(self):
-        return math.sqrt((self.end_p.x - self.start_p.x)**2 + (self.end_p.y - self.start_p.y)**2) * globalprops.KM_PER_UNIT
+    def get_length(self):
+        return self.length
 
     def calculate_parameter_distance(self, distance):
-        return distance / self.calculate_length()
+        return distance / self.get_length()
 
     def calculate_point(self, t):
         return Point(self.start_p.x + self.dir_vector[0] * t, self.start_p.y + self.dir_vector[1] * t)

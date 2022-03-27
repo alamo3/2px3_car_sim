@@ -14,18 +14,41 @@ class CarSpawner:
         self.next_car = self.get_next_car_time()
 
     def get_next_car_time(self):
-        return random.uniform(10.0, 60.0)
+        return random.uniform(15.0, 20.0)
 
     def generate_car(self, dt):
         global car_id_generated
         self.timer = self.timer + dt
         if self.timer > self.next_car:
-            new_car = Car(0.0, 0.0, 0.0, self.lane_num, car_id_generated)
+            num_cars = hi.get_num_cars_lane(self.lane_num)
+
+            if num_cars > 40:
+                self.reset_timers()
+                return
+
+            new_car = Car(0.0, self.lane_num, car_id_generated)
+
+            reaction_time = self.generate_number(0.75, 2.0)
+            min_follow = self.generate_number(150, 200)
+            max_accel = self.generate_number(2.07, 5.5)
+            comf_decel = self.generate_number(0.5, 1.0)
+            max_speed = self.generate_number(130, 190)
+
+            new_car.init_controller(min_follow, 2.1, reaction_time, max_accel, comf_decel, max_speed)
+
             hi.highway.add_car_to_lane(self.lane_num, new_car)
             cm.cars.append(new_car)
             car_id_generated = car_id_generated + 1
-            self.next_car = self.get_next_car_time()
-            self.timer = 0
+
+            self.reset_timers()
+
+    def reset_timers(self):
+        self.next_car = self.get_next_car_time()
+        self.timer = 0
+
+    def generate_number(self, low, high):
+        return random.uniform(low, high)
+
 
 
 class TestPolicy(DrivingPolicy):
@@ -36,9 +59,12 @@ class TestPolicy(DrivingPolicy):
         self.generate_second = True
         self.first_lane = 0
         self.generators = [CarSpawner(0), CarSpawner(1), CarSpawner(2)]
+        self.init_lane_properties()
 
-    def initialize(self):
-        pass
+    def init_lane_properties(self):
+        hi.highway.lanes[0].speed_limit = 130
+        hi.highway.lanes[1].speed_limit = 110
+        hi.highway.lanes[2].speed_limit = 100
 
     def remove_completed_cars(self):
         cars_to_remove = [car for car in cm.cars if car.reached_end]

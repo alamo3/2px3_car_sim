@@ -30,11 +30,11 @@ def get_distance_between_cars(car: Car, other_car: Car):
     elif segment_num_car < other_car.segment_num:
         # car is ahead of us
         dist_car = car.distance_on_segment
-        distance_remaining_car = lane.segments[car.segment_num].calculate_length() - dist_car
+        distance_remaining_car = lane.segments[car.segment_num].get_length() - dist_car
         distance_between_segments = 0
 
         for i in range(car.segment_num + 1, other_car.segment_num):
-            distance_between_segments = distance_between_segments + lane.segments[i].calculate_length()
+            distance_between_segments = distance_between_segments + lane.segments[i].get_length()
 
         return distance_remaining_car + distance_between_segments + other_car.distance_on_segment
     else:
@@ -54,5 +54,6 @@ def get_lead_car(car: Car):
 
             if closest_dist > distance > 0:
                 closest_car = other_car
+                closest_dist = distance
 
     return closest_car, closest_dist

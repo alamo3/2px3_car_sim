@@ -54,8 +54,6 @@ class Simulation:
             tkinter.messagebox.showerror(title='Road Simulator', message='Error loading highway from file!')
             self.highway = None
 
-        self.driving_policy.initialize()
-
     def handle_button_press(self, button_ident):
         if button_ident == ButtonIdent.load_highway:
             self.load_highway()

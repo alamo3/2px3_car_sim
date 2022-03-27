@@ -155,13 +155,13 @@ class Lane:
     def calculate_length(self):
         calculated_distance = 0
         for segment in self.segments:
-            calculated_distance = calculated_distance + segment.calculate_length()
+            calculated_distance = calculated_distance + segment.get_length()
 
     def get_pos_segment_distance(self, distance):
         calculated_distance = 0
 
         for segment in self.segments:
-            calculated_distance = calculated_distance + segment.calculate_length()
+            calculated_distance = calculated_distance + segment.get_length()
             if calculated_distance >= distance:
                 remain_distance = calculated_distance - distance
 
