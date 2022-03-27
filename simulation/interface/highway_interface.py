@@ -1,6 +1,5 @@
-from road.highway import Highway
 
-highway: Highway = None
+highway = None
 
 
 def get_num_lanes():

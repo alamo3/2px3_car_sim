@@ -36,9 +36,13 @@ class CurvedRoad(Road):
             parameter = (1 / BEZIER_RESOLUTION) * i
             point = self.calculate_point(parameter)
             self.segments.append(Line(prev_point.x, prev_point.y, point.x, point.y))
-            curvature = (1 / self.calculate_curvature(parameter)) * globalprops.KM_PER_UNIT
-            self.curvatures.append(round(curvature, 3))
-            print(1 / self.curvatures[-1])
+
+            if self.start_p and self.end_p and self.control_point:
+                curvature_calc = self.calculate_curvature(parameter)
+                curvature_calc = 1 if curvature_calc == 0 else curvature_calc
+                curvature = (1 / curvature_calc) * globalprops.KM_PER_UNIT
+                self.curvatures.append(round(curvature, 3))
+
             prev_point = point
 
     def calculate_curvature(self, t):
