@@ -8,6 +8,11 @@ import random
 
 car_id_generated = 0
 
+LOW_CONGESTION_FOLLOW = (60, 90)
+HIGH_CONGESTION_FOLLOW = (120, 180)
+
+FAST_GENERATION = (5.0, 7.0)
+SPARSE_GENERATION = (15.0, 40.0)
 
 class CarSpawner:
     def __init__(self, lane_num: int):
@@ -16,7 +21,8 @@ class CarSpawner:
         self.next_car = self.get_next_car_time()
 
     def get_next_car_time(self):
-        return random.uniform(5.0, 7.0)
+        selected_tuple = FAST_GENERATION
+        return random.uniform(selected_tuple[0], selected_tuple[1])
 
     def generate_car(self, dt):
         global car_id_generated
@@ -30,8 +36,10 @@ class CarSpawner:
 
             new_car = Car(0.0, self.lane_num, car_id_generated)
 
+            selected_tuple = HIGH_CONGESTION_FOLLOW
+
             reaction_time = self.generate_number(0.75, 2.0)
-            min_follow = self.generate_number(120, 170)
+            min_follow = self.generate_number(selected_tuple[0], selected_tuple[1])
             max_accel = self.generate_number(2.07, 5.5)
             comf_decel = self.generate_number(0.5, 1.0)
             max_speed = self.generate_number(130, 190)
@@ -86,6 +94,10 @@ class TestPolicy(DrivingPolicy):
 
     def random_lane_change(self):
         num_cars = len(cm.cars) - 1
+
+        if num_cars == -1:
+            return
+
         chosen_car_i = random.randint(0, num_cars)
         chosen_car = cm.cars[chosen_car_i]
         chosen_car.initiate_lane_change(self.choose_new_lane(chosen_car.lane_num))
