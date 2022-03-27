@@ -13,7 +13,7 @@ from car.sdcar import SDCar
 
 class Highway:
 
-    def __init__(self, num_lanes=1, lane_width=70, origin_point=(50, 870)):
+    def __init__(self, num_lanes=1, lane_width=50, origin_point=(50, 870)):
         self.num_lanes = num_lanes
         self.lane_width = lane_width
         self.lanes = []

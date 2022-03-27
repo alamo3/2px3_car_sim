@@ -75,10 +75,10 @@ class Lane:
         new_segments = []
         for segment in self.segments:
             if segment.road_type == Type.straight:
-                new_segment = Utils.translate_line_segment(segment, dx)
+                new_segment = Utils.translate_line_segment(segment, 0, dx)
 
             else:
-                new_segment = Utils.translate_curved_segment(segment, dx)
+                new_segment = Utils.translate_curved_segment(segment, 0, dx)
 
             if not len(new_segments) == 0:
                 last_segment = new_segments[-1]
@@ -86,7 +86,7 @@ class Lane:
 
             new_segments.append(new_segment)
 
-        lane.origin_point = Utils.translate_point_horizontal(self.origin_point, dx)
+        lane.origin_point = Utils.translate_point_vertical(self.origin_point, dx)
         lane.segments = new_segments
 
         return lane
