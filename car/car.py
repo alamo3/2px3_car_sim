@@ -10,6 +10,8 @@ import car.car_manager as cm
 
 class Car:
 
+    font_txt = None
+
     def __init__(self, risk_factor, lane_num, car_id=0):
 
         # distance, position and orientation data
@@ -26,6 +28,7 @@ class Car:
 
         # identification and control data
         self.car_id = car_id
+        self.str_car_id = str(car_id)
         self.lead_car = None
         self.slowing_curve = False
         self.controller: VehicleController = None
@@ -38,6 +41,13 @@ class Car:
 
         # heuristic data
         self.risk_factor = risk_factor
+
+        # optimization
+        self.prev_str = None
+        self.prev_str_surface = None
+
+        if Car.font_txt is None:
+            Car.font_txt = pygame.font.Font(None, 15)
 
     def init_controller(self, min_following_distance, accel_smoothing, reaction_time, max_accel, comf_decel, max_speed):
         max_speed = max_speed / 3.6
@@ -139,6 +149,7 @@ class Car:
         speed_ms = self.speed / 3.6
 
         distance_travelled = (time_second * speed_ms) + (0.5 * accel * delta_time * delta_time)
+        distance_travelled = 0 if distance_travelled < 0 else distance_travelled
         distance_travelled_km = distance_travelled / 1000.0
         self.distance_on_segment = self.distance_on_segment + distance_travelled_km
         self.distance_total = self.distance_total + distance_travelled_km
@@ -167,10 +178,13 @@ class Car:
 
         pygame.draw.circle(draw_surface, draw_color, self.pos.get_tuple(), 10)
 
-        txt = str(self.car_id) + "/" + str(self.lead_car.car_id) if self.lead_car is not None else str(self.car_id)
+        txt = self.str_car_id + "/" + str(self.lead_car.car_id) if self.lead_car is not None else self.str_car_id
         txt = txt + "/" + str(round(self.speed))
-        txt_surface = pygame.font.Font(None, 15).render(txt, True, (0, 0, 0))
-        draw_surface.blit(txt_surface, (self.pos.x, self.pos.y))
+
+        if not txt == self.prev_str:
+            self.prev_str_surface = Car.font_txt.render(txt, True, (0, 0, 0))
+
+        draw_surface.blit(self.prev_str_surface, (self.pos.x, self.pos.y))
 
         if self.changing_lanes:
             pygame.draw.circle(draw_surface, (255, 15, 20), self.pos.get_tuple(),

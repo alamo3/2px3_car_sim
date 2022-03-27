@@ -1,4 +1,4 @@
-import math
+from math import sqrt
 from geometry.Point import Point
 import globalprops
 
@@ -10,7 +10,7 @@ class Line:
         self.x1 = x1
         self.y1 = y1
         self.dir_vector = Point(x1 - x, y1 - y)
-        self.length_units = math.sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2)
+        self.length_units = sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2)
         self.length = self.length_units * globalprops.KM_PER_UNIT
 
     def get_length(self):
@@ -61,10 +61,10 @@ class Line:
         return Point(px, py)
 
     def is_point_on_line(self, point: Point):
-        dist_ap = math.sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
-        dist_pb = math.sqrt((self.x1 - point.x) ** 2 + (self.y1 - point.y) ** 2)
+        dist_ap = sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
+        dist_pb = sqrt((self.x1 - point.x) ** 2 + (self.y1 - point.y) ** 2)
 
-        dist_ab = self.get_length() / globalprops.KM_PER_UNIT
+        dist_ab = self.get_length_units()
 
         return ((dist_ap + dist_pb) - dist_ab) < 0.0000000005
 

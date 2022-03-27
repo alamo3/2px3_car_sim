@@ -22,6 +22,9 @@ class VehicleController:
         else:
             self.current_speed += self.current_accel * dt
 
+        if self.current_speed < 0:
+            print("bug")
+
         # Update acceleration
         alpha = 0
         if lead:

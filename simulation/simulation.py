@@ -65,7 +65,7 @@ class Simulation:
 
     def update(self, dt):
         if self.driving_policy:
-            self.driving_policy.update(1)
+            self.driving_policy.update(5)
 
     def draw(self, draw_surface):
         self.draw_highway(draw_surface)

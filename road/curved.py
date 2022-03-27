@@ -74,7 +74,7 @@ class CurvedRoad(Road):
             pygame.draw.circle(surface, (255, 0, 0), self.end_p.get_tuple(), 10)
 
         for line in self.segments:
-            i = self.segments.index(line)
+            # i = self.segments.index(line)
             # if i % 100 == 0:
             #     txt_surface = pygame.font.Font(None, 15).render(str(self.curvatures[i]), True, (0, 0, 0))
             #     surface.blit(txt_surface, (line.x, line.y))
@@ -104,20 +104,25 @@ class CurvedRoad(Road):
                 return segment.get_point_for_distance(remain_distance)
 
     def calculate_tangent(self, pos: Point):
-        segment = self.find_segment_for_point(pos)
+        segment, i = self.find_segment_for_point(pos)
         return segment.get_perpendicular_point(pos)
 
     def find_segment_for_point(self, pos: Point):
+        i = 0
         for segment in self.segments:
             if segment.is_point_on_line(pos):
-                return segment
+                return segment, i
+
+            i = i + 1
+
+        return None, -1
 
     def get_curvature_factor(self, pos):
-        segment = self.find_segment_for_point(pos)
-        return self.curvatures[self.segments.index(segment)] if segment is not None else 1
+        segment, index = self.find_segment_for_point(pos)
+        return self.curvatures[index] if segment is not None else 1
 
     def get_dir_vector(self, pos: Point):
-        segment = self.find_segment_for_point(pos)
+        segment, i = self.find_segment_for_point(pos)
         return Line(pos.x, pos.y, segment.x1, segment.y1)
 
     def calculate_intersection_perp(self, segment: Road, pos: Point):
