@@ -2,26 +2,25 @@ from typing import List
 
 from geometry.utils import Utils
 import globalprops
-from car.car import Car
 import simulation.interface.highway_interface as hi
 
-cars: List[Car] = []
+cars = []
 
 
-def cars_in_radius(car: Car, radius_km: float):
+def cars_in_radius(car, radius_km: float):
     circle_origin = car.pos
     radius_sim = radius_km / globalprops.KM_PER_UNIT
     cars_found = []
 
-    for car in cars:
-        car_pos = car.pos
+    for car_other in cars:
+        car_pos = car_other.pos
         if Utils.does_point_lie_in_circle(car_pos, circle_origin, radius_sim):
-            cars_found.append(car)
+            cars_found.append(car_other)
 
     return cars_found
 
 
-def get_distance_between_cars(car: Car, other_car: Car):
+def get_distance_between_cars(car, other_car):
     lane = hi.get_lane_by_id(car.lane_num)
     segment_num_car = car.segment_num
 
@@ -41,7 +40,7 @@ def get_distance_between_cars(car: Car, other_car: Car):
         return get_distance_between_cars(other_car, car)  # just switch cars around (car is behind other_car)
 
 
-def get_lead_car(car: Car):
+def get_lead_car(car):
     lane_num = car.lane_num
     segment_num = car.segment_num
 

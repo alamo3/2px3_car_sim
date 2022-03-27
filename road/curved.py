@@ -114,7 +114,7 @@ class CurvedRoad(Road):
 
     def get_curvature_factor(self, pos):
         segment = self.find_segment_for_point(pos)
-        return self.curvatures[self.segments.index(segment)]
+        return self.curvatures[self.segments.index(segment)] if segment is not None else 1
 
     def get_dir_vector(self, pos: Point):
         segment = self.find_segment_for_point(pos)

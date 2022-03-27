@@ -5,12 +5,15 @@ from road.road import Road
 import pygame
 from road.type import Type
 from car.car_controller import VehicleController
+import car.car_manager as cm
 
 
 class Car:
 
     def __init__(self, risk_factor, lane_num, car_id=0):
-        self.risk_factor = risk_factor
+
+        # distance, position and orientation data
+
         self.lane_num = lane_num
         self.speed = 100
         self.pos: Point = self.get_starting_pos()
@@ -20,10 +23,21 @@ class Car:
         self.reached_end = False
         self.distance_total = 0
         self.debug_changed_lane = False
+
+        # identification and control data
         self.car_id = car_id
         self.lead_car = None
         self.slowing_curve = False
         self.controller: VehicleController = None
+
+        # lane change data
+        self.changing_lanes = False
+        self.blindspot_circle_radius = 0
+        self.lane_change_timeout = 0
+        self.new_lane_num = 0
+
+        # heuristic data
+        self.risk_factor = risk_factor
 
     def init_controller(self, min_following_distance, accel_smoothing, reaction_time, max_accel, comf_decel, max_speed):
         max_speed = max_speed / 3.6
@@ -38,13 +52,35 @@ class Car:
         lane = self.get_lane()
         return lane.segments[self.segment_num]
 
-    def perform_lane_change(self, new_lane_num):
+    def initiate_lane_change(self, new_lane_num):
+        self.changing_lanes = True
+        self.new_lane_num = new_lane_num
+        self.lane_change_timeout = 0
+
+    def perform_lane_change(self, dt):
+
+        self.lane_change_timeout = self.lane_change_timeout + dt
+
+        if self.lane_change_timeout > 30.0:
+            self.changing_lanes = False
+            return
+
+        new_lane_num = self.new_lane_num
         new_lane = highway_interface.get_lane_by_id(new_lane_num)
         prev_lane = self.get_lane()
         new_segment_pos = new_lane.get_position_on_lane(self.get_segment(), self.pos)
 
         if new_segment_pos[0] is None:
             return  # abort lane change, not possible
+
+        self.blindspot_circle_radius = new_segment_pos[0].distance_to(self.pos) * globalprops.KM_PER_UNIT
+        self.blindspot_circle_radius = self.blindspot_circle_radius + 0.029
+
+        cars_in_search_radius = cm.cars_in_radius(self, self.blindspot_circle_radius)
+
+        for car in cars_in_search_radius:
+            if car.lane_num == new_lane_num:
+                return
 
         self.pos = new_segment_pos[0]
         self.lane_num = new_lane_num
@@ -54,6 +90,9 @@ class Car:
         self.debug_changed_lane = True
         prev_lane.cars.remove(self)
         new_lane.cars.append(self)
+
+        self.changing_lanes = False
+        self.lane_change_timeout = 0
 
     def adjust_following_distance(self):
         pass
@@ -73,7 +112,7 @@ class Car:
 
     def calculate_curve_slowdown(self):
         if self.current_segment.road_type == Type.curved:
-            speed_adjustment = (1 - self.current_segment.get_curvature_factor(self.pos)) * 20
+            speed_adjustment = (1 - self.current_segment.get_curvature_factor(self.pos)) * 15
             if speed_adjustment < 0:
                 speed_adjustment = 0
             self.slowing_curve = False if speed_adjustment < 2 else True
@@ -82,7 +121,7 @@ class Car:
             self.slowing_curve = False
             return 0
 
-    def move_forward_in_lane(self, delta_time, lead_car=None, lead_distance=0):
+    def update(self, delta_time, lead_car=None, lead_distance=0):
 
         self.lead_car = lead_car
 
@@ -117,6 +156,9 @@ class Car:
         else:
             self.pos = self.current_segment.calculate_point_distance(self.distance_on_segment)
 
+        if self.changing_lanes:
+            self.perform_lane_change(delta_time)
+
     def draw(self, draw_surface):
         draw_color = (206, 0, 252)
 
@@ -129,3 +171,7 @@ class Car:
         txt = txt + "/" + str(round(self.speed))
         txt_surface = pygame.font.Font(None, 15).render(txt, True, (0, 0, 0))
         draw_surface.blit(txt_surface, (self.pos.x, self.pos.y))
+
+        if self.changing_lanes:
+            pygame.draw.circle(draw_surface, (255, 15, 20), self.pos.get_tuple(),
+                               self.blindspot_circle_radius / globalprops.KM_PER_UNIT, 2)

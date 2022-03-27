@@ -51,10 +51,13 @@ class Line:
 
     @staticmethod
     def find_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
-        px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / (
-                    (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4))
-        py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / (
-                    (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4))
+
+        first_term = x1 * y2 - y1 * x2
+        second_term = x3 * y4 - y3 * x4
+        denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+
+        px = (first_term * (x3 - x4) - (x1 - x2) * second_term) / denom
+        py = (first_term * (y3 - y4) - (y1 - y2) * second_term) / denom
         return Point(px, py)
 
     def is_point_on_line(self, point: Point):

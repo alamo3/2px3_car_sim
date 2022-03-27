@@ -27,7 +27,7 @@ class Window:
         self.quit_callback = None
         self.update_callback = None
         self.prev_time = time.time()
-        self.background_color = (255,255,255)
+        self.background_color = (255, 255, 255)
 
         pygame.display.set_caption(window_title)
 

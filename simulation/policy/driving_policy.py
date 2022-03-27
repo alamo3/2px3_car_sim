@@ -7,3 +7,7 @@ class DrivingPolicy(ABC):
     @abstractmethod
     def update(self, dt):
         pass
+
+    @abstractmethod
+    def draw(self, draw_surface):
+        pass

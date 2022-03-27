@@ -193,3 +193,14 @@ class Lane:
             return None, -1, -1
 
         return closest_point, self.segments.index(closest_segment), closest_segment.get_distance_to_point(closest_point)
+
+    def get_average_traffic_flow(self):
+
+        if len(self.cars) == 0:
+            return 0
+
+        traffic_flow_accum = 0
+        for car in self.cars:
+            traffic_flow_accum = traffic_flow_accum + car.speed
+
+        return traffic_flow_accum / len(self.cars)
