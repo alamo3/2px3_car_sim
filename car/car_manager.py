@@ -55,4 +55,4 @@ def get_lead_car(car: Car):
             if closest_dist > distance > 0:
                 closest_car = other_car
 
-    return closest_car
+    return closest_car, closest_dist

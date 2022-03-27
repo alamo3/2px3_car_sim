@@ -68,7 +68,7 @@ class TestPolicy(DrivingPolicy):
             #     car.perform_lane_change(self.choose_new_lane(car.lane_num))
             #     self.timer = 0.0
 
-            lead_car = cm.get_lead_car(car)
-            car.move_forward_in_lane(dt, lead_car)
+            lead_car, dist = cm.get_lead_car(car)
+            car.move_forward_in_lane(dt, lead_car, dist)
 
 

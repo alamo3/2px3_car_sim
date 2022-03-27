@@ -4,6 +4,7 @@ from geometry.Point import Point
 from road.road import Road
 import pygame
 from road.type import Type
+from car.car_controller import VehicleController
 
 
 class Car:
@@ -24,6 +25,11 @@ class Car:
         self.car_id = car_id
         self.lead_car = None
         self.slowing_curve = False
+        self.controller: VehicleController = None
+
+    def init_controller(self, min_following_distance, accel_smoothing, reaction_time,max_accel, comf_decel, max_speed):
+        self.controller = VehicleController(min_following_distance, accel_smoothing, reaction_time, max_accel,
+                                            comf_decel, max_speed, self.speed)
 
     def get_starting_pos(self):
         lane = self.get_lane()
@@ -66,19 +72,19 @@ class Car:
     def get_lane(self):
         return highway_interface.get_lane_by_id(self.lane_num)
 
-    def move_forward_in_lane(self, delta_time, lead_car=None):
+    def move_forward_in_lane(self, delta_time, lead_car=None, lead_distance=0):
 
         self.lead_car = lead_car
 
         if self.debug_changed_lane:
-            print("Break")
+            #print("Break")
             self.debug_changed_lane = False
 
         speed_adjustment = 0
 
         if self.current_segment.road_type == Type.curved:
             speed_adjustment = (1 - self.current_segment.get_curvature_factor(self.pos)) * 25
-            self.slowing_curve = False if speed_adjustment == 0 else True
+            self.slowing_curve = False if speed_adjustment < 2 else True
         else:
             self.slowing_curve = False
 
