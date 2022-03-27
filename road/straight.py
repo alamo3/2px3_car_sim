@@ -57,6 +57,8 @@ class StraightRoad(Road):
         if 0.0 <= param_intx <= 1.0:
             return intx
 
+    def get_curvature_factor(self, pos):
+        return 1
 
     def get_distance_to_point(self, pos):
         return self.start_p.distance_to(pos) * globalprops.KM_PER_UNIT

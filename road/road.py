@@ -53,3 +53,7 @@ class Road(ABC):
     def get_distance_to_point(self, pos):
         pass
 
+    @abstractmethod
+    def get_curvature_factor(self, pos):
+        pass
+

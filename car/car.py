@@ -3,6 +3,7 @@ import simulation.interface.highway_interface as highway_interface
 from geometry.Point import Point
 from road.road import Road
 import pygame
+from road.type import Type
 
 
 class Car:
@@ -21,6 +22,8 @@ class Car:
         self.distance_total = 0
         self.debug_changed_lane = False
         self.car_id = car_id
+        self.lead_car = None
+        self.slowing_curve = False
 
     def get_starting_pos(self):
         lane = self.get_lane()
@@ -65,14 +68,21 @@ class Car:
 
     def move_forward_in_lane(self, delta_time, lead_car=None):
 
-        if lead_car is not None:
-            print("Lead car for "+str(self.car_id)+" is "+str(lead_car.car_id))
+        self.lead_car = lead_car
 
         if self.debug_changed_lane:
             print("Break")
             self.debug_changed_lane = False
 
-        distance_travelled = (delta_time / 3600) * self.speed
+        speed_adjustment = 0
+
+        if self.current_segment.road_type == Type.curved:
+            speed_adjustment = (1 - self.current_segment.get_curvature_factor(self.pos)) * 25
+            self.slowing_curve = False if speed_adjustment == 0 else True
+        else:
+            self.slowing_curve = False
+
+        distance_travelled = (delta_time / 3600) * (self.speed - speed_adjustment)
         self.distance_on_segment = self.distance_on_segment + distance_travelled
         self.distance_total = self.distance_total + distance_travelled
 
@@ -90,6 +100,13 @@ class Car:
             self.pos = self.current_segment.calculate_point_distance(self.distance_on_segment)
 
     def draw(self, draw_surface):
-        pygame.draw.circle(draw_surface, (206, 0, 252), self.pos.get_tuple(), 10)
-        txt_surface = pygame.font.Font(None, 15).render(str(self.car_id), True, (0, 0, 0))
+        draw_color = (206, 0, 252)
+
+        if self.slowing_curve:
+            draw_color = (255, 0, 0)
+
+        pygame.draw.circle(draw_surface, draw_color, self.pos.get_tuple(), 10)
+
+        txt = str(self.car_id)+"/"+str(self.lead_car.car_id) if self.lead_car is not None else str(self.car_id)
+        txt_surface = pygame.font.Font(None, 15).render(txt, True, (0, 0, 0))
         draw_surface.blit(txt_surface, (self.pos.x, self.pos.y))

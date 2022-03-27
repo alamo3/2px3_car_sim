@@ -49,7 +49,8 @@ class Simulation:
             self.highway.load_highway(file_name)
             highway_interface.highway = self.highway
             self.driving_policy = simulation.policy.test_policy.TestPolicy()
-        except:
+        except Exception as e:
+            print(str(e))
             tkinter.messagebox.showerror(title='Road Simulator', message='Error loading highway from file!')
             self.highway = None
 

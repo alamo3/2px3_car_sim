@@ -17,6 +17,7 @@ class CurvedRoad(Road):
         Road.__init__(self, begin_point, end_point, Type.curved)
         self.control_point = control_point
         self.segments: List[Line] = []
+        self.curvatures: List[float] = []
 
         self.calculate_curve()
 
@@ -34,7 +35,32 @@ class CurvedRoad(Road):
             parameter = (1 / BEZIER_RESOLUTION) * i
             point = self.calculate_point(parameter)
             self.segments.append(Line(prev_point.x, prev_point.y, point.x, point.y))
+            curvature = (1 / self.calculate_curvature(parameter)) * globalprops.KM_PER_UNIT
+            self.curvatures.append(round(curvature, 3))
+            print(1 / self.curvatures[-1])
             prev_point = point
+
+    def calculate_curvature(self, t):
+        d = self.calculate_first_derivative(t)
+        dd = self.calculate_second_derivative(t)
+        numerator = (d.x * dd.y) - (dd.x * d.y)
+        denom = math.pow(d.x**2 + d.y**2, 3/2)
+
+        if denom == 0:
+            return -1  # no curvature
+        else:
+            return abs(numerator/denom)
+
+    def calculate_first_derivative(self, t):
+        p1p0 = self.control_point.subtract(self.start_p)
+        first_term = p1p0.multiply(2*(1-t))
+        p2p1 = self.end_p.subtract(self.control_point)
+        second_term = p2p1.multiply(2*t)
+        return first_term.add(second_term)
+
+    def calculate_second_derivative(self, t):
+        p2p1p0 = self.end_p.subtract(self.control_point.multiply(2)).add(self.start_p)
+        return p2p1p0.multiply(2)
 
     def points(self):
         return [self.start_p, self.control_point, self.end_p]
@@ -47,6 +73,11 @@ class CurvedRoad(Road):
             pygame.draw.circle(surface, (255, 0, 0), self.end_p.get_tuple(), 10)
 
         for line in self.segments:
+            i = self.segments.index(line)
+            # if i % 100 == 0:
+            #     txt_surface = pygame.font.Font(None, 15).render(str(self.curvatures[i]), True, (0, 0, 0))
+            #     surface.blit(txt_surface, (line.x, line.y))
+
             pygame.draw.line(surface, (0, 255, 0), (line.x, line.y), (line.x1, line.y1))
 
     def calculate_length(self):
@@ -76,6 +107,10 @@ class CurvedRoad(Road):
         for segment in self.segments:
             if segment.is_point_on_line(pos):
                 return segment
+
+    def get_curvature_factor(self, pos):
+        segment = self.find_segment_for_point(pos)
+        return self.curvatures[self.segments.index(segment)]
 
     def get_dir_vector(self, pos: Point):
         segment = self.find_segment_for_point(pos)
