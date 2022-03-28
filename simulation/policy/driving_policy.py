@@ -5,9 +5,9 @@ from abc import abstractmethod
 class DrivingPolicy(ABC):
 
     @abstractmethod
-    def initialize(self):
+    def update(self, dt):
         pass
 
     @abstractmethod
-    def update(self, dt):
+    def draw(self, draw_surface):
         pass

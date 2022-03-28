@@ -3,6 +3,7 @@ from enum import Enum
 
 from road.straight import StraightRoad
 from road.curved import CurvedRoad
+from road.road import Road
 from road.type import Type
 import pygame
 from geometry.Point import Point
@@ -10,6 +11,7 @@ from geometry.utils import Utils
 
 from car.car import Car
 from car.sdcar import SDCar
+from typing import List
 
 
 class LaneType(Enum):
@@ -20,7 +22,7 @@ class LaneType(Enum):
 class Lane:
 
     def __init__(self, lane_num):
-        self.segments = []
+        self.segments: List[Road] = []
         self.lane_num = lane_num
         self.origin_point: Point = None
         self.lane_txt = pygame.font.Font(None, 15).render("Lane " + str(self.lane_num), True, (0, 0, 0))
@@ -73,10 +75,10 @@ class Lane:
         new_segments = []
         for segment in self.segments:
             if segment.road_type == Type.straight:
-                new_segment = Utils.translate_line_segment(segment, dx)
+                new_segment = Utils.translate_line_segment(segment, 0, dx)
 
             else:
-                new_segment = Utils.translate_curved_segment(segment, dx)
+                new_segment = Utils.translate_curved_segment(segment, 0, dx)
 
             if not len(new_segments) == 0:
                 last_segment = new_segments[-1]
@@ -84,7 +86,7 @@ class Lane:
 
             new_segments.append(new_segment)
 
-        lane.origin_point = Utils.translate_point_horizontal(self.origin_point, dx)
+        lane.origin_point = Utils.translate_point_vertical(self.origin_point, dx)
         lane.segments = new_segments
 
         return lane
@@ -107,7 +109,10 @@ class Lane:
             surface.blit(self.lane_txt, (self.origin_point.x - 10, self.origin_point.y + 12))
 
         for segment in self.segments:
-            segment.draw(surface)
+            if self.lane_type == LaneType.AUTONOMOUS_LANE:
+                segment.draw(surface, (233, 142, 98))
+            else:
+                segment.draw(surface)
 
         if self.temp_segment is not None:
             self.temp_segment.draw(surface)
@@ -153,31 +158,37 @@ class Lane:
     def calculate_length(self):
         calculated_distance = 0
         for segment in self.segments:
-            calculated_distance = calculated_distance + segment.calculate_length()
+            calculated_distance = calculated_distance + segment.get_length()
 
     def get_pos_segment_distance(self, distance):
         calculated_distance = 0
-
+        index = 0
         for segment in self.segments:
-            calculated_distance = calculated_distance + segment.calculate_length()
+            calculated_distance = calculated_distance + segment.get_length()
             if calculated_distance >= distance:
                 remain_distance = calculated_distance - distance
 
-                if self.segments.index(segment) == 0:
+                if index == 0:
                     remain_distance = distance
 
-                return segment.calculate_point_distance(remain_distance), self.segments.index(segment), remain_distance
+                return segment.calculate_point_distance(remain_distance), index, remain_distance
+
+            index = index + 1
 
     def get_position_on_lane(self, segment, current_pos):
 
         closest_distance = 1000000
         closest_point = None
         closest_segment = None
+        closest_index = 10000000
+
+        index = 0
 
         for lane_segment in self.segments:
             intx_point = lane_segment.calculate_intersection_perp(segment, current_pos)
 
             if intx_point is None:
+                index = index + 1
                 continue
 
             dist = intx_point.distance_to(current_pos)
@@ -186,8 +197,22 @@ class Lane:
                 closest_point = intx_point
                 closest_distance = dist
                 closest_segment = lane_segment
+                closest_index = index
+
+            index = index + 1
 
         if closest_segment is None:
             return None, -1, -1
 
-        return closest_point, self.segments.index(closest_segment), closest_segment.get_distance_to_point(closest_point)
+        return closest_point, closest_index, closest_segment.get_distance_to_point(closest_point)
+
+    def get_average_traffic_flow(self):
+
+        if len(self.cars) == 0:
+            return 0
+
+        traffic_flow_accum = 0
+        for car in self.cars:
+            traffic_flow_accum = traffic_flow_accum + car.speed
+
+        return traffic_flow_accum / len(self.cars)

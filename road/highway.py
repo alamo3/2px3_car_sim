@@ -13,7 +13,7 @@ from car.sdcar import SDCar
 
 class Highway:
 
-    def __init__(self, num_lanes=1, lane_width=70, origin_point=(50, 870)):
+    def __init__(self, num_lanes=1, lane_width=50, origin_point=(50, 870)):
         self.num_lanes = num_lanes
         self.lane_width = lane_width
         self.lanes = []
@@ -65,7 +65,7 @@ class Highway:
             Utils.create_temp_straight_segment(entry_ramp, self.lane_width, translate=False)
         elif self.editing_mode_curve and self.temp_curve_end_point is not None:
             Utils.create_temp_curved_segment(entry_ramp, self.lane_width, Point.t2p(self.temp_curve_end_point),
-                                       translate=False)
+                                             translate=False)
 
     def draw_temp_lanes(self):
 
@@ -104,9 +104,10 @@ class Highway:
 
     def complete_curved_segment_lane(self, lane, point, translate=True):
         end_point = Utils.translate_point_for_lane(Point.t2p(self.temp_curve_end_point), lane.lane_num,
-                                             self.lane_width) if translate else Point.t2p(self.temp_curve_end_point)
+                                                   self.lane_width) if translate else Point.t2p(
+            self.temp_curve_end_point)
         control_point = Utils.translate_point_for_lane(Point.t2p(point), lane.lane_num,
-                                                 self.lane_width) if translate else Point.t2p(point)
+                                                       self.lane_width) if translate else Point.t2p(point)
         lane.complete_temp_segment_curve(end_point, control_point)
 
     def complete_adding_curve_segment_ramp(self, point):
@@ -125,7 +126,8 @@ class Highway:
         self.temp_curve_end_point = None
 
     def complete_line_segment_lane(self, lane, point, translate=True):
-        lane_point = Utils.translate_point_for_lane(Point.t2p(point), lane.lane_num, self.lane_width) if translate else point
+        lane_point = Utils.translate_point_for_lane(Point.t2p(point), lane.lane_num,
+                                                    self.lane_width) if translate else point
         lane.complete_temp_segment_line(lane_point)
 
     def complete_adding_line_segment_ramp(self, point):
@@ -220,11 +222,11 @@ class Highway:
 
         for i in range(self.num_lanes):
             new_lane = Lane(i)
-            new_lane.load(highway_dict["lane_"+str(i)])
+            new_lane.load(highway_dict["lane_" + str(i)])
             self.lanes.append(new_lane)
 
         for i in range(highway_dict["num_ramps"]):
-            ramp_dict = highway_dict["onramp_"+str(i)]
+            ramp_dict = highway_dict["onramp_" + str(i)]
             attaching_lane = ramp_dict["attaching_lane"]
             new_ramp = Ramp(i, attaching_lane)
             new_ramp.load(ramp_dict)

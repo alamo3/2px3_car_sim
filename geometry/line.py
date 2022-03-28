@@ -1,4 +1,4 @@
-import math
+from math import sqrt
 from geometry.Point import Point
 import globalprops
 
@@ -10,12 +10,14 @@ class Line:
         self.x1 = x1
         self.y1 = y1
         self.dir_vector = Point(x1 - x, y1 - y)
+        self.length_units = sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2)
+        self.length = self.length_units * globalprops.KM_PER_UNIT
 
     def get_length(self):
-        return math.sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2) * globalprops.KM_PER_UNIT
+        return self.length
 
     def get_length_units(self):
-        return math.sqrt((self.x1 - self.x) ** 2 + (self.y1 - self.y) ** 2)
+        return self.length_units
 
     def get_perpendicular(self):
         return self.get_perpendicular_point(Point(self.x, self.y))
@@ -49,17 +51,20 @@ class Line:
 
     @staticmethod
     def find_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
-        px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / (
-                    (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4))
-        py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / (
-                    (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4))
+
+        first_term = x1 * y2 - y1 * x2
+        second_term = x3 * y4 - y3 * x4
+        denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+
+        px = (first_term * (x3 - x4) - (x1 - x2) * second_term) / denom
+        py = (first_term * (y3 - y4) - (y1 - y2) * second_term) / denom
         return Point(px, py)
 
     def is_point_on_line(self, point: Point):
-        dist_ap = math.sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
-        dist_pb = math.sqrt((self.x1 - point.x) ** 2 + (self.y1 - point.y) ** 2)
+        dist_ap = sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
+        dist_pb = sqrt((self.x1 - point.x) ** 2 + (self.y1 - point.y) ** 2)
 
-        dist_ab = self.get_length() / globalprops.KM_PER_UNIT
+        dist_ab = self.get_length_units()
 
         return ((dist_ap + dist_pb) - dist_ab) < 0.0000000005
 

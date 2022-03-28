@@ -9,7 +9,7 @@ def get_mouse_clicked():
 
 
 class Window:
-    SIM_FPS = 30  # simulator runs at 30 fps
+    SIM_FPS = 60  # simulator runs at 60 fps
     FPSTicker = pygame.time.Clock()  # create pygame fps clock
 
     def __init__(self, window_title):
@@ -27,7 +27,7 @@ class Window:
         self.quit_callback = None
         self.update_callback = None
         self.prev_time = time.time()
-        self.background_color = (255,255,255)
+        self.background_color = (255, 255, 255)
 
         pygame.display.set_caption(window_title)
 

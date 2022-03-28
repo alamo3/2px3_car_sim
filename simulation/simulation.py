@@ -1,7 +1,6 @@
 import tkinter.messagebox
 
 import pygame
-from pygame.locals import *
 import simulation.interface.highway_interface as highway_interface
 import simulation.policy.test_policy
 
@@ -49,11 +48,10 @@ class Simulation:
             self.highway.load_highway(file_name)
             highway_interface.highway = self.highway
             self.driving_policy = simulation.policy.test_policy.TestPolicy()
-        except:
+        except Exception as e:
+            print(str(e))
             tkinter.messagebox.showerror(title='Road Simulator', message='Error loading highway from file!')
             self.highway = None
-
-        self.driving_policy.initialize()
 
     def handle_button_press(self, button_ident):
         if button_ident == ButtonIdent.load_highway:
@@ -71,3 +69,6 @@ class Simulation:
 
     def draw(self, draw_surface):
         self.draw_highway(draw_surface)
+
+        if self.driving_policy:
+            self.driving_policy.draw(draw_surface)

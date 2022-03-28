@@ -15,6 +15,15 @@ class Point:
     def toString(self):
         return str(self.x) + "," + str(self.y)
 
+    def add(self, point):
+        return Point(self.x + point.x, self.y + point.y)
+
+    def multiply(self, k):
+        return Point(self.x * k, self.y * k)
+
+    def subtract(self, point):
+        return self.add(point.multiply(-1))
+
     @staticmethod
     def t2p(tup):
         return Point(tup[0], tup[1])

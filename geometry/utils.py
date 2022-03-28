@@ -25,19 +25,25 @@ class Utils:
     def translate_point_vertical(point: Point, dy):
         origin_y = point.y + dy
         return Point(point.x, origin_y)
+    
+    @staticmethod 
+    def translate_point(point: Point, dx, dy):
+        new_x = point.x + dx
+        new_y = point.y + dy
+        return Point(new_x, new_y)
 
     @staticmethod
-    def translate_line_segment(segment: StraightRoad, dx):
-        new_start = Utils.translate_point_horizontal(segment.start_p, dx)
-        new_end = Utils.translate_point_horizontal(segment.end_p, dx)
+    def translate_line_segment(segment: StraightRoad, dx=0, dy=0):
+        new_start = Utils.translate_point(segment.start_p, dx, dy)
+        new_end = Utils.translate_point(segment.end_p, dx, dy)
 
         return StraightRoad(new_start, new_end)
 
     @staticmethod
-    def translate_curved_segment(segment: CurvedRoad, dx):
-        new_start = Utils.translate_point_horizontal(segment.start_p, dx)
-        new_end = Utils.translate_point_horizontal(segment.end_p, dx)
-        new_control = Utils.translate_point_horizontal(segment.control_point, dx)
+    def translate_curved_segment(segment: CurvedRoad, dx=0, dy=0):
+        new_start = Utils.translate_point(segment.start_p, dx, dy)
+        new_end = Utils.translate_point(segment.end_p, dx, dy)
+        new_control = Utils.translate_point(segment.control_point, dx, dy)
 
         return CurvedRoad(new_start, new_control, new_end)
 
@@ -56,8 +62,8 @@ class Utils:
 
     @staticmethod
     def translate_point_for_lane(point: Point, lane_num, lane_width):
-        lane_origin_x = point.x + (lane_width * lane_num)
-        return Point(lane_origin_x, point.y)
+        lane_origin_y = point.y + (lane_width * lane_num)
+        return Point(point.x, lane_origin_y)
 
     @staticmethod
     def dist_points(p0: Point, p1: Point):

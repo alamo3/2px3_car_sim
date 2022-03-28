@@ -9,6 +9,7 @@ class Road(ABC):
         self.start_p = start_p
         self.end_p = end_p
         self.road_type = type
+        self.length = 0
 
     def points(self):
         return [self.start_p, self.end_p]
@@ -18,11 +19,11 @@ class Road(ABC):
         pass
 
     @abstractmethod
-    def draw(self, surface):
+    def draw(self, surface, color=(0, 255, 0)):
         pass
 
     @abstractmethod
-    def calculate_length(self):
+    def get_length(self):
         pass
 
     @abstractmethod
@@ -51,5 +52,9 @@ class Road(ABC):
 
     @abstractmethod
     def get_distance_to_point(self, pos):
+        pass
+
+    @abstractmethod
+    def get_curvature_factor(self, pos):
         pass
 
