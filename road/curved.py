@@ -70,7 +70,7 @@ class CurvedRoad(Road):
     def points(self):
         return [self.start_p, self.control_point, self.end_p]
 
-    def draw(self, surface):
+    def draw(self, surface, color=(0, 255, 0)):
 
         if globalprops.EDITING_MODE:
             self.calculate_curve()
@@ -83,7 +83,7 @@ class CurvedRoad(Road):
             #     txt_surface = pygame.font.Font(None, 15).render(str(self.curvatures[i]), True, (0, 0, 0))
             #     surface.blit(txt_surface, (line.x, line.y))
 
-            pygame.draw.line(surface, (0, 255, 0), (line.x, line.y), (line.x1, line.y1))
+            pygame.draw.line(surface, color, (line.x, line.y), (line.x1, line.y1))
 
     def calculate_length(self):
         calculated_length = 0

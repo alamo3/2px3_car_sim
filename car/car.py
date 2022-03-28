@@ -1,3 +1,5 @@
+import random
+
 import globalprops
 import simulation.interface.highway_interface as highway_interface
 from geometry.Point import Point
@@ -83,14 +85,22 @@ class Car:
         if new_segment_pos[0] is None:
             return  # abort lane change, not possible
 
-        self.blindspot_circle_radius = new_segment_pos[0].distance_to(self.pos) * globalprops.KM_PER_UNIT
-        self.blindspot_circle_radius = self.blindspot_circle_radius + 0.029
+        # perform blind-spot check
 
-        cars_in_search_radius = cm.cars_in_radius(self, self.blindspot_circle_radius)
+        ignore_check = random.choices([0, 1], [1-self.risk_factor, self.risk_factor])
 
-        for car in cars_in_search_radius:
-            if car.lane_num == new_lane_num:
-                return
+        if ignore_check[0] == 0:
+            self.blindspot_circle_radius = new_segment_pos[0].distance_to(self.pos) * globalprops.KM_PER_UNIT
+            self.blindspot_circle_radius = self.blindspot_circle_radius + 0.035
+
+            cars_in_search_radius = cm.cars_in_radius(self, self.blindspot_circle_radius)
+
+            for car in cars_in_search_radius:
+                if car.lane_num == new_lane_num:
+                    return
+        else:
+            print("CHECK IGNORED", self.car_id)
+            highway_interface.risky_attempts = highway_interface.risky_attempts + 1
 
         self.pos = new_segment_pos[0]
         self.lane_num = new_lane_num

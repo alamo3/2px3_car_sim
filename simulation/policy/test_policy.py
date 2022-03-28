@@ -1,27 +1,33 @@
 import pygame.font
 
+import road.lane
 from simulation.policy.driving_policy import DrivingPolicy
 import simulation.interface.highway_interface as hi
 from car.car import Car
+from car.sdcar import SDCar
 import car.car_manager as cm
 import random
 
 car_id_generated = 0
 
 LOW_CONGESTION_FOLLOW = (60, 90)
-HIGH_CONGESTION_FOLLOW = (120, 180)
+HIGH_CONGESTION_FOLLOW = (100, 130)
 
-FAST_GENERATION = (5.0, 7.0)
-SPARSE_GENERATION = (15.0, 40.0)
+FAST_GENERATION = (10.0, 15.0)
+SPARSE_GENERATION = (15.0, 30.0)
+
+RISK_FACTOR_DRIVER = (0.0, 0.01)
+
 
 class CarSpawner:
-    def __init__(self, lane_num: int):
+    def __init__(self, lane_num: int, autonomous_lane=False):
         self.lane_num = lane_num
         self.timer = 0
+        self.autonomous_lane = autonomous_lane
         self.next_car = self.get_next_car_time()
 
     def get_next_car_time(self):
-        selected_tuple = FAST_GENERATION
+        selected_tuple = FAST_GENERATION if not self.autonomous_lane else SPARSE_GENERATION
         return random.uniform(selected_tuple[0], selected_tuple[1])
 
     def generate_car(self, dt):
@@ -34,14 +40,25 @@ class CarSpawner:
                 self.reset_timers()
                 return
 
-            new_car = Car(0.0, self.lane_num, car_id_generated)
+            new_car = None
+
+            if self.autonomous_lane:
+                new_car = SDCar(self.lane_num, car_id_generated)
+            else:
+                decision = random.choices([0, 1], [0.95, 0.05])
+
+                if decision[0] == 0:
+                    risk_factor = self.generate_number(RISK_FACTOR_DRIVER[0], RISK_FACTOR_DRIVER[1])
+                    new_car = Car(risk_factor, self.lane_num, car_id_generated)
+                elif decision[0] == 1:
+                    new_car = SDCar(self.lane_num, car_id_generated)
 
             selected_tuple = HIGH_CONGESTION_FOLLOW
 
             reaction_time = self.generate_number(0.75, 2.0)
             min_follow = self.generate_number(selected_tuple[0], selected_tuple[1])
             max_accel = self.generate_number(2.07, 5.5)
-            comf_decel = self.generate_number(0.5, 1.0)
+            comf_decel = self.generate_number(0.2, 0.3)
             max_speed = self.generate_number(130, 190)
 
             new_car.init_controller(min_follow, 1.5, reaction_time, max_accel, comf_decel, max_speed)
@@ -67,15 +84,28 @@ class TestPolicy(DrivingPolicy):
         self.timer_second = 0
         self.generate_second = True
         self.first_lane = 0
-        self.generators = [CarSpawner(0), CarSpawner(1), CarSpawner(2)]
+        self.generators = [CarSpawner(0, True), CarSpawner(1), CarSpawner(2)]
+        self.select_autonomous_lane(0)
+        #self.select_autonomous_lane(1)
+
+        if hi.get_num_lanes() > 3:
+            self.generators.append(CarSpawner(3))
+
         self.init_lane_properties()
         self.total_timer = 0
         self.font = pygame.font.Font(None, 30)
 
+    def select_autonomous_lane(self, lane_num):
+        hi.highway.lanes[lane_num].lane_type = road.lane.LaneType.AUTONOMOUS_LANE
+
     def init_lane_properties(self):
-        hi.highway.lanes[0].speed_limit = 130
-        hi.highway.lanes[1].speed_limit = 110
-        hi.highway.lanes[2].speed_limit = 100
+        hi.highway.lanes[0].speed_limit = 180
+        hi.highway.lanes[1].speed_limit = 130
+        hi.highway.lanes[2].speed_limit = 110
+
+        if hi.get_num_lanes() == 4:
+            hi.highway.lanes[3].speed_limit = 100
+
 
     def remove_completed_cars(self):
         cars_to_remove = [car for car in cm.cars if car.reached_end]
@@ -90,7 +120,10 @@ class TestPolicy(DrivingPolicy):
         elif lane_num == 1:
             return 2
         elif lane_num == 2:
-            return 1
+            rand_decision = random.uniform(0, 1)
+            return 3 if rand_decision > 0.5 and hi.get_num_lanes() > 3 else 1
+        elif lane_num == 3:
+            return 2
 
     def random_lane_change(self):
         num_cars = len(cm.cars) - 1
@@ -134,5 +167,10 @@ class TestPolicy(DrivingPolicy):
 
         t_time = "Time: "+str(round(self.total_timer))
         txt_time = self.font.render(t_time, True, (0, 0, 0))
-        draw_surface.blit(txt_flow, (650, 70))
-        draw_surface.blit(txt_time, (650, 100))
+
+        t_incidents = "Risky Maneuvers: "+str(hi.risky_attempts)
+        txt_incidents = self.font.render(t_incidents, True, (0, 0, 0))
+
+        draw_surface.blit(txt_flow, (200, 70))
+        draw_surface.blit(txt_time, (200, 100))
+        draw_surface.blit(txt_incidents, (200, 130))

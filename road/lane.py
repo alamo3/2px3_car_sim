@@ -109,7 +109,10 @@ class Lane:
             surface.blit(self.lane_txt, (self.origin_point.x - 10, self.origin_point.y + 12))
 
         for segment in self.segments:
-            segment.draw(surface)
+            if self.lane_type == LaneType.AUTONOMOUS_LANE:
+                segment.draw(surface, (233, 142, 98))
+            else:
+                segment.draw(surface)
 
         if self.temp_segment is not None:
             self.temp_segment.draw(surface)

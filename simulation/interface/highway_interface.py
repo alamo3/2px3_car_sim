@@ -1,5 +1,7 @@
+import road.lane
 
 highway = None
+risky_attempts = 0
 
 
 def get_num_lanes():
@@ -8,6 +10,16 @@ def get_num_lanes():
 
 def get_lane_by_id(lane_id):
     return highway.lanes[lane_id]
+
+
+def get_autonomous_lanes():
+    lanes = []
+
+    for lane in highway.lanes:
+        if lane.lane_type == road.lane.LaneType.AUTONOMOUS_LANE:
+            lanes.append(lane)
+
+    return lanes
 
 
 def get_num_cars_lane(lane_id):

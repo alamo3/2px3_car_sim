@@ -19,14 +19,14 @@ class StraightRoad(Road):
             self.dir_vector = (p2.x - p1.x, p2.y - p1.y)
             self.length = math.sqrt((self.end_p.x - self.start_p.x)**2 + (self.end_p.y - self.start_p.y)**2) * globalprops.KM_PER_UNIT
 
-    def draw(self, surface):
+    def draw(self, surface, color=(0, 0, 255)):
 
         if globalprops.EDITING_MODE:
             # pygame.draw.circle(surface, (255, 0, 0), self.start_p, 10)
             pygame.draw.circle(surface, (255, 0, 0), self.end_p.get_tuple(), 10)
 
         if (self.start_p is not None) and (self.end_p is not None):
-            pygame.draw.line(surface, (0, 0, 255), self.start_p.get_tuple(), self.end_p.get_tuple())
+            pygame.draw.line(surface, color, self.start_p.get_tuple(), self.end_p.get_tuple())
 
     def get_length(self):
         return self.length

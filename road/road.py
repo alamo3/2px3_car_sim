@@ -19,7 +19,7 @@ class Road(ABC):
         pass
 
     @abstractmethod
-    def draw(self, surface):
+    def draw(self, surface, color=(0, 255, 0)):
         pass
 
     @abstractmethod
