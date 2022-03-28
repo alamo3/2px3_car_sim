@@ -84,9 +84,9 @@ class TestPolicy(DrivingPolicy):
         self.timer_second = 0
         self.generate_second = True
         self.first_lane = 0
-        self.generators = [CarSpawner(0, True), CarSpawner(1), CarSpawner(2)]
+        self.generators = [CarSpawner(0, True), CarSpawner(1, True), CarSpawner(2)]
         self.select_autonomous_lane(0)
-        #self.select_autonomous_lane(1)
+        self.select_autonomous_lane(1)
 
         if hi.get_num_lanes() > 3:
             self.generators.append(CarSpawner(3))
@@ -100,11 +100,11 @@ class TestPolicy(DrivingPolicy):
 
     def init_lane_properties(self):
         hi.highway.lanes[0].speed_limit = 180
-        hi.highway.lanes[1].speed_limit = 130
-        hi.highway.lanes[2].speed_limit = 110
+        hi.highway.lanes[1].speed_limit = 170
+        hi.highway.lanes[2].speed_limit = 130
 
         if hi.get_num_lanes() == 4:
-            hi.highway.lanes[3].speed_limit = 100
+            hi.highway.lanes[3].speed_limit = 120
 
 
     def remove_completed_cars(self):

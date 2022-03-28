@@ -10,7 +10,6 @@ class SDCar(Car):
         Car.__init__(self, 0,  lane_num, car_id)
         self.target_lane = self.choose_autonomous_lane()
 
-
     def choose_autonomous_lane(self):
         autonomous_lanes = hi.get_autonomous_lanes()
         lane_selected = random.randint(0, len(autonomous_lanes)-1)
